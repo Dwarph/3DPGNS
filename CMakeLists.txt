@@ -59,5 +59,5 @@ add_definitions(
         -D_CRT_SECURE_NO_WARNINGS
 )
 
-add_executable(3DPGNS main.cpp Controllers/DiamondSquare.cpp Controllers/DiamondSquare.h)
+add_executable(3DPGNS main.cpp DiamondSquare.cpp DiamondSquare.h)
 
