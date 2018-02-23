@@ -8,6 +8,7 @@
 #include <vector>
 
 using namespace std;
+
 class DiamondSquare {
 
 public:
@@ -23,6 +24,15 @@ private :
     int maxX, maxZ, maxY;
     float roughness;
     vector<vector<float> > heightMap;
+
+    void square_step(int x, int z, int size, float offset);
+
+    void diamond_step(int x, int z, int size, float offset);
+
+    float getValue(int x, int z);
+
+    void resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
+
 };
 
 
