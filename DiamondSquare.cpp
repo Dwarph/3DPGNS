@@ -48,7 +48,7 @@ int randInRange(int range) {
     return rand() % range + 1;
 }
 
-void divide(int size) {
+void DiamondSquare::divide(int size) {
 
     int halfSize = size / 2;
     float scale = roughness * size;
@@ -70,7 +70,7 @@ void divide(int size) {
 }
 
 
-vector<vector<float>> getHeightMap() {
+vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
 }
 

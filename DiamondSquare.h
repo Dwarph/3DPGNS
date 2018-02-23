@@ -15,11 +15,14 @@ public:
 
     vector<vector<float>> getHeightMap();
 
-private :
     void divide(int size);
+
+
+private :
 
     int maxX, maxZ, maxY;
     float roughness;
+    vector<vector<float> > heightMap;
 };
 
 
