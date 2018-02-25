@@ -59,5 +59,22 @@ add_definitions(
         -D_CRT_SECURE_NO_WARNINGS
 )
 
-add_executable(3DPGNS main.cpp DiamondSquare.cpp DiamondSquare.h)
+add_executable(3DPGNS
+        main.cpp
+        DiamondSquare.cpp
+        DiamondSquare.h
+
+        external/OpenGLTutorialUsefulFiles/shader.cpp
+        external/OpenGLTutorialUsefulFiles/shader.hpp
+
+        external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader)
+
+target_link_libraries(3DPGNS
+        ${ALL_LIBS}
+        )
+
+set_target_properties(3DPGNS PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")
+create_target_launcher(3DPGNS WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")
+
 

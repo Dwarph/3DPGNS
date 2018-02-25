@@ -6,6 +6,8 @@
 #define INC_3DPGNS_DIAMONDSQUARE_H
 
 #include <vector>
+#include <GL/glew.h>
+
 
 using namespace std;
 
@@ -17,6 +19,8 @@ public:
     vector<vector<float>> getHeightMap();
 
     void divide(int size);
+
+    GLfloat *getVertices();
 
 
 private :

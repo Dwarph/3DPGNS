@@ -5,7 +5,6 @@
 #include "DiamondSquare.h"
 #include <stdlib.h>     /* srand, rand */
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -20,11 +19,18 @@ DiamondSquare::DiamondSquare(int max, float roughness) {
     this->maxY = (maxX + maxZ) / 3; //height
     this->roughness = roughness;
     resizeVec(heightMap, max, max);
-    for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < 7; j++) {
+    for (int i = 0; i < max; i++) {
+        for (int j = 0; j < max; j++) {
             heightMap.at(i).at(j) = 0;
         }
     }
+
+    this->heightMap.at(0).at(0) = max / 2;
+    this->heightMap.at(max - 1).at(0) = max / 2;
+    this->heightMap.at(max - 1).at(max - 1) = max / 2;
+    this->heightMap.at(0).at(max - 1) = max / 2;
+
+
     this->divide(max);
 }
 
@@ -83,8 +89,21 @@ int randInRange(int range) {
 
 void DiamondSquare::divide(int size) {
 
+
+    for (int i = 0; i < this->maxX; i++) {
+        for (int j = 0; j < this->maxZ; j++) {
+            cout << " " << this->heightMap.at(i).at(j);
+        }
+        cout << endl;
+    }
+    cout << "===============" << endl;
+
     int halfSize = size / 2;
+    if (halfSize < 1) {
+        return;
+    }
     float scale = roughness * size;
+
 
     float randNum = ((float) randInRange(10)) / 10;
 
@@ -100,11 +119,32 @@ void DiamondSquare::divide(int size) {
         }
     }
 
+    divide(size / 2);
+
 }
 
 
 vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
+}
+
+GLfloat *DiamondSquare::getVertices() {
+    int noOfVertices = ((this->maxZ - 1) * (this->maxX - 1)) * 2 * 3; //*2 for noOfTriangles, then *3 for noOfVerts.
+    GLfloat vertices[noOfVertices];
+    for (int x = 0; x < this->maxX - 1; x++) {
+        for (int z = 0; z < this->maxZ - 1; z++) {
+            int indice = (x + z) + z * 3;
+
+            vertices[indice] = this->heightMap.at(x).at(z);
+            vertices[++indice] = this->heightMap.at(x).at(z + 1);
+            if (z % 2 == 0) {
+                vertices[++indice] = this->heightMap.at(x + 1).at(z + 1);
+            } else {
+                vertices[++indice] = this->heightMap.at(x).at(z + 1);
+            }
+        }
+    }
+    return vertices;
 }
 
 //http://www.cplusplus.com/forum/beginner/102670/ source
