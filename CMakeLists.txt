@@ -67,6 +67,9 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp
 
+        external/OpenGLTutorialUsefulFiles/controls.cpp
+        external/OpenGLTutorialUsefulFiles/controls.hpp
+
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
         external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader)
 

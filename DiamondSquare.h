@@ -20,7 +20,7 @@ public:
 
     void divide(int size);
 
-    GLfloat *getVertices();
+    GLfloat *getVertices(GLfloat *vertices);
 
 
 private :
@@ -28,6 +28,7 @@ private :
     int maxX, maxZ, maxY;
     float roughness;
     vector<vector<float> > heightMap;
+
 
     void square_step(int x, int z, int size, float offset);
 
