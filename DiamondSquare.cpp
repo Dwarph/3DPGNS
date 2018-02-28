@@ -170,6 +170,10 @@ GLfloat *DiamondSquare::getVertices(GLfloat *vertices) {
     return vertices;
 }
 
+
+float DiamondSquare::getHeight(int x, int z) {
+    return heightMap.at(x).at(z);
+}
 //http://www.cplusplus.com/forum/beginner/102670/ source
 void DiamondSquare::resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS,
                               const unsigned short COLUMNS) {

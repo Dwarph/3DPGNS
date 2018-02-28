@@ -22,6 +22,9 @@ public:
 
     GLfloat *getVertices(GLfloat *vertices);
 
+    float getHeight(int x, int z);
+
+
 
 private :
 
@@ -29,12 +32,11 @@ private :
     float roughness;
     vector<vector<float> > heightMap;
 
+    float getValue(int x, int z);
 
     void square_step(int x, int z, int size, float offset);
 
     void diamond_step(int x, int z, int size, float offset);
-
-    float getValue(int x, int z);
 
     void resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
