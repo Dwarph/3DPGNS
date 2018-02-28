@@ -757,12 +757,11 @@ int openGLMagic() {
                         index++;
 //                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z);
                         cout << index << endl;
-                        index++;
                         g_vertex_buffer_data[index] = 0;
-                        cout << index << endl;
                         index++;
+                        cout << index << endl;
                         g_vertex_buffer_data[index] = z;
-
+                        index++;
                         break;
                     case 1:
                         cout << index << endl;
