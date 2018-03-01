@@ -115,7 +115,7 @@ int openGLMagic() {
 //    mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 
-    int max = 4;
+    int max = 80;
 
     DiamondSquare *diamondSquare = new DiamondSquare(max, 1);
 
@@ -742,80 +742,100 @@ int openGLMagic() {
             0.982f, 0.099f, 0.879f
     };
 
-    int noOfVertices = ((max - 1) * (max - 1)) * 2 * 3 *
+    int noOfVertices = ((max) * (max)) * 2 * 3 *
                        3; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
     GLfloat g_vertex_buffer_data[noOfVertices];
     int index = 0;
-    for (int x = 0; x < max - 1; x++) {
-        for (int z = 0; z < max - 1; z++) {
-
+    for (int z = 0; z < max; z++) {
+        for (int x = 0; x < max; x++) {
             for (int i = 0; i < 3; i++) {
-                switch (i) {
-                    case 0:
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = x;
-                        index++;
+                for (int j = 0; j < 2; j++) {
+
+                    switch (i) {
+                        case 0:
+                            if (j == 0) {
+                                g_vertex_buffer_data[index] = x;
+
+                            } else {
+                                g_vertex_buffer_data[index] = x + 1;
+
+                            }
+                            index++;
 //                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z);
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = 0;
-                        index++;
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = z;
-                        index++;
-                        break;
-                    case 1:
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = x + 1;
-                        index++;
-//                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = 0;
-                        index++;
-                        cout << index << endl;
-                        g_vertex_buffer_data[index] = z;
-                        index++;
-
-                        break;
-                    case 2:
-                        cout << index << endl;
-
-                        if (z % 2 == 0) {
-                            g_vertex_buffer_data[index] = x;
-                            index++;
-//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x + 1, z + 1);
-                            cout << index << endl;
                             g_vertex_buffer_data[index] = 0;
                             index++;
-                            cout << index << endl;
-                            g_vertex_buffer_data[index] = z + 1;
+                            g_vertex_buffer_data[index] = z;
                             index++;
-                        } else {
-                            g_vertex_buffer_data[index] = x - 1;
-                            index++;
+                            break;
+
+
+                        case 1:
+
+                            if (j == 0) {
+                                g_vertex_buffer_data[index] = x;
+                                index++;
 //                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
-                            cout << index << endl;
-                            g_vertex_buffer_data[index] = 0;
-                            index++;
-                            cout << index << endl;
-                            g_vertex_buffer_data[index] = z + 1;
-                            index++;
-                        }
+                                g_vertex_buffer_data[index] = 0;
+                                index++;
+                                g_vertex_buffer_data[index] = z + 1;
+                                index++;
+                            } else {
+                                g_vertex_buffer_data[index] = x + 1;
+                                index++;
+//                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
+                                g_vertex_buffer_data[index] = 0;
+                                index++;
+                                g_vertex_buffer_data[index] = z;
+                                index++;
+                            }
+                            break;
+                        case 2:
 
+                            if (j == 0) {
+                                g_vertex_buffer_data[index] = x + 1;
+                                index++;
+//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
+                                g_vertex_buffer_data[index] = 0;
+                                index++;
+                                g_vertex_buffer_data[index] = z + 1;
+                                index++;
 
-                        break;
+                            } else {
+                                g_vertex_buffer_data[index] = x;
+                                index++;
+//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x + 1, z + 1);
+                                g_vertex_buffer_data[index] = 0;
+                                index++;
+                                g_vertex_buffer_data[index] = z + 1;
+                                index++;
+                            }
+                            break;
+                    }
                 }
-
             }
-
-
         }
     }
 
 
+    for (
+            int i = 0;
+            i < noOfVertices;
+            i++) {
+        cout << g_vertex_buffer_data[i] << ", ";
+        if ((i + 1) % 3 == 0) {
+            cout <<
+                 endl;
+        }
+
+        if ((i + 1) % 18 == 0) {
+            cout <<
+                 endl;
+        }
+
+    }
 
 
-
-    /** terrain values **/
+/** terrain values **/
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -828,25 +848,28 @@ int openGLMagic() {
 
     do {
 
-        // Clear the screen
+// Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Use our shader
+// Use our shader
         glUseProgram(programID);
+
 // Compute the MVP matrix from keyboard and mouse input
         computeMatricesFromInputs();
+
         mat4 ProjectionMatrix = getProjectionMatrix();
         mat4 ViewMatrix = getViewMatrix();
         mat4 ModelMatrix = glm::mat4(1.0);
         mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 
-        /** Cube display commands**/
-        // Send our transformation to the currently bound shader,
-        // in the "MVP" uniform
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+/** Cube display commands**/
+// Send our transformation to the currently bound shader,
+// in the "MVP" uniform
+        glUniformMatrix4fv(MatrixID,
+                           1, GL_FALSE, &MVP[0][0]);
 
-        // 1rst attribute buffer : vertices
+// 1rst attribute buffer : vertices
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
@@ -858,7 +881,7 @@ int openGLMagic() {
                 (void *) 0            // array buffer offset
         );
 
-        // 2nd attribute buffer : colors
+// 2nd attribute buffer : colors
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
         glVertexAttribPointer(
@@ -870,27 +893,31 @@ int openGLMagic() {
                 (void *) 0                          // array buffer offset
         );
 
-        // Draw the cube !
+// Draw the cube !
         glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
 
-        // Swap buffers
+// Swap buffers
         glfwSwapBuffers(window);
+
         glfwPollEvents();
 
     } // Check if the ESC key was pressed or the window was closed
-    while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-           glfwWindowShouldClose(window) == 0);
+    while (
+            glfwGetKey(window,
+                       GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+            glfwWindowShouldClose(window)
+            == 0);
 
-    // Cleanup VBO and shader
+// Cleanup VBO and shader
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &colorbuffer);
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &VertexArrayID);
 
-    // Close OpenGL window and terminate GLFW
+// Close OpenGL window and terminate GLFW
     glfwTerminate();
 
     return 0;
