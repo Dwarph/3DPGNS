@@ -67,7 +67,7 @@ int windowSetup() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
-    // Dark blue background
+    //blue background
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
     // Enable depth test
@@ -77,7 +77,7 @@ int windowSetup() {
 
 
     // Cull triangles which normal is not towards the camera
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 }
 
 int openGLMagic() {
@@ -115,9 +115,11 @@ int openGLMagic() {
 //    mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 
-    int max = 80;
+    //our width and depth of our grid
+    int max = 200;
 
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 1);
+    //creates a new diamondSquare heightMap
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 0.1);
 
 
     // GLfloat *g_vertex_buffer_data;
@@ -127,11 +129,15 @@ int openGLMagic() {
     // diamondSquare->getVertices(g_vertex_buffer_data);
 
 
+    //works out the needed number of vertices
 
     int noOfVertices = ((max) * (max)) * 2 * 3 *
                        3; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
     GLfloat g_vertex_buffer_data[noOfVertices];
     int index = 0;
+    //iterates over the depth (z) and the width (x)
+    //then iterates 3 times for each vertice in a triangle
+    //and 2 times for 2 triangles per square
     for (int z = 0; z < max; z++) {
         for (int x = 0; x < max; x++) {
             for (int i = 0; i < 3; i++) {
@@ -141,14 +147,14 @@ int openGLMagic() {
                         case 0:
                             if (j == 0) {
                                 g_vertex_buffer_data[index] = x;
+                                index++;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z);
 
                             } else {
                                 g_vertex_buffer_data[index] = x + 1;
-
+                                index++;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z);
                             }
-                            index++;
-//                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z);
-                            g_vertex_buffer_data[index] = 0;
                             index++;
                             g_vertex_buffer_data[index] = z;
                             index++;
@@ -160,16 +166,14 @@ int openGLMagic() {
                             if (j == 0) {
                                 g_vertex_buffer_data[index] = x;
                                 index++;
-//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
-                                g_vertex_buffer_data[index] = 0;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z + 1);
                                 index++;
                                 g_vertex_buffer_data[index] = z + 1;
                                 index++;
                             } else {
                                 g_vertex_buffer_data[index] = x + 1;
                                 index++;
-//                        g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
-                                g_vertex_buffer_data[index] = 0;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z);
                                 index++;
                                 g_vertex_buffer_data[index] = z;
                                 index++;
@@ -180,8 +184,7 @@ int openGLMagic() {
                             if (j == 0) {
                                 g_vertex_buffer_data[index] = x + 1;
                                 index++;
-//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x, z + 1);
-                                g_vertex_buffer_data[index] = 0;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z + 1);
                                 index++;
                                 g_vertex_buffer_data[index] = z + 1;
                                 index++;
@@ -189,8 +192,7 @@ int openGLMagic() {
                             } else {
                                 g_vertex_buffer_data[index] = x;
                                 index++;
-//                            g_vertex_buffer_data[++index] = diamondSquare->getHeight(x + 1, z + 1);
-                                g_vertex_buffer_data[index] = 0;
+                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z + 1);
                                 index++;
                                 g_vertex_buffer_data[index] = z + 1;
                                 index++;
@@ -203,24 +205,24 @@ int openGLMagic() {
     }
 
 
-    for (
-            int i = 0;
-            i < noOfVertices;
-            i++) {
-        cout << g_vertex_buffer_data[i] << ", ";
-        if ((i + 1) % 3 == 0) {
-            cout <<
-                 endl;
-        }
+//    for (
+//            int i = 0;
+//            i < noOfVertices;
+//            i++) {
+//        cout << g_vertex_buffer_data[i] << ", ";
+//        if ((i + 1) % 3 == 0) {
+//            cout <<
+//                 endl;
+//        }
+//
+//        if ((i + 1) % 18 == 0) {
+//            cout <<
+//                 endl;
+//        }
+//
+//    }
 
-        if ((i + 1) % 18 == 0) {
-            cout <<
-                 endl;
-        }
-
-    }
-
-    // One color for each vertex. They were generated randomly.
+    // One color for each vertex. Generated randomly each time.
     GLfloat g_color_buffer_data[noOfVertices];
 
     for (int i = 0; i < noOfVertices; i++) {
@@ -230,12 +232,12 @@ int openGLMagic() {
     }
 
 
-/** terrain values **/
+/** Bind vertices to buffer**/
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
+/** bind colours **/
     GLuint colorbuffer;
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
@@ -258,7 +260,7 @@ int openGLMagic() {
         mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 
-/** Cube display commands**/
+/** Terrain display commands**/
 // Send our transformation to the currently bound shader,
 // in the "MVP" uniform
         glUniformMatrix4fv(MatrixID,
@@ -288,7 +290,7 @@ int openGLMagic() {
                 (void *) 0                          // array buffer offset
         );
 
-// Draw the cube !
+// Draw the Terrain !
         glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
 
         glDisableVertexAttribArray(0);
