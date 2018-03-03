@@ -121,106 +121,14 @@ int openGLMagic() {
     //creates a new diamondSquare heightMap
     DiamondSquare *diamondSquare = new DiamondSquare(max, 0.1);
 
-
-    // GLfloat *g_vertex_buffer_data;
-
-    // diamondSquare->getVertices(g_vertex_buffer_data);
-
-    // diamondSquare->getVertices(g_vertex_buffer_data);
-
-
     //works out the needed number of vertices
-
     int noOfVertices = ((max) * (max)) * 2 * 3 *
                        3; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
     GLfloat g_vertex_buffer_data[noOfVertices];
-    int index = 0;
-    //iterates over the depth (z) and the width (x)
-    //then iterates 3 times for each vertice in a triangle
-    //and 2 times for 2 triangles per square
-    for (int z = 0; z < max; z++) {
-        for (int x = 0; x < max; x++) {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 2; j++) {
 
-                    switch (i) {
-                        case 0:
-                            if (j == 0) {
-                                g_vertex_buffer_data[index] = x;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z);
+    diamondSquare->getVertices(g_vertex_buffer_data);
 
-                            } else {
-                                g_vertex_buffer_data[index] = x + 1;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z);
-                            }
-                            index++;
-                            g_vertex_buffer_data[index] = z;
-                            index++;
-                            break;
-
-
-                        case 1:
-
-                            if (j == 0) {
-                                g_vertex_buffer_data[index] = x;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z + 1);
-                                index++;
-                                g_vertex_buffer_data[index] = z + 1;
-                                index++;
-                            } else {
-                                g_vertex_buffer_data[index] = x + 1;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z);
-                                index++;
-                                g_vertex_buffer_data[index] = z;
-                                index++;
-                            }
-                            break;
-                        case 2:
-
-                            if (j == 0) {
-                                g_vertex_buffer_data[index] = x + 1;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x + 1, z + 1);
-                                index++;
-                                g_vertex_buffer_data[index] = z + 1;
-                                index++;
-
-                            } else {
-                                g_vertex_buffer_data[index] = x;
-                                index++;
-                                g_vertex_buffer_data[index] = diamondSquare->getHeight(x, z + 1);
-                                index++;
-                                g_vertex_buffer_data[index] = z + 1;
-                                index++;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
-
-//    for (
-//            int i = 0;
-//            i < noOfVertices;
-//            i++) {
-//        cout << g_vertex_buffer_data[i] << ", ";
-//        if ((i + 1) % 3 == 0) {
-//            cout <<
-//                 endl;
-//        }
-//
-//        if ((i + 1) % 18 == 0) {
-//            cout <<
-//                 endl;
-//        }
-//
-//    }
+    // diamondSquare->getVertices(g_vertex_buffer_data);
 
     // One color for each vertex. Generated randomly each time.
     GLfloat g_color_buffer_data[noOfVertices];
@@ -230,6 +138,19 @@ int openGLMagic() {
         col /= 100;
         g_color_buffer_data[i] = col;
     }
+
+    //prints out vertices
+//    for (int i = 0; i < noOfVertices; i++) {
+//        cout << g_vertex_buffer_data[i] << ", ";
+//        if ((i + 1) % 3 == 0) {
+//            cout << endl;
+//        }
+//
+//        if ((i + 1) % 18 == 0) {
+//            cout << endl;
+//        }
+//
+//    }
 
 
 /** Bind vertices to buffer**/

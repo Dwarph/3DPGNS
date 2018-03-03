@@ -128,7 +128,7 @@ vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
 }
 
-GLfloat *DiamondSquare::getVertices(GLfloat *vertices) {
+void *DiamondSquare::getVertices(GLfloat *vertices) {
 
     int index = 0;
     //iterates over the depth (z) and the width (x)
@@ -199,7 +199,6 @@ GLfloat *DiamondSquare::getVertices(GLfloat *vertices) {
             }
         }
     }
-    return vertices;
 }
 
 
