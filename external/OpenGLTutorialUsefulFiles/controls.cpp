@@ -6,6 +6,7 @@ extern GLFWwindow *window; // The "extern" keyword here is to access the variabl
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 using namespace glm;
 
@@ -24,11 +25,11 @@ glm::mat4 getProjectionMatrix() {
 
 
 // Initial position : on +Z
-glm::vec3 position = glm::vec3(0, 10, 0);
+glm::vec3 position = glm::vec3(0, -1, 0);
 // Initial horizontal angle : toward -Z
-float horizontalAngle = 0.0f;
+float horizontalAngle = 4.0f;
 // Initial vertical angle : none
-float verticalAngle = 0.0f;
+float verticalAngle = 9.0f;
 // Initial Field of View
 float initialFoV = 45.0f;
 
@@ -103,4 +104,6 @@ void computeMatricesFromInputs() {
 
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
+
+//    std::cout << "horizon: " << horizontalAngle << ", verticalAngle: " << verticalAngle << std::endl;
 }

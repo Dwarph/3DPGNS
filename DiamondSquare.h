@@ -20,7 +20,7 @@ public:
 
     void divide(int size);
 
-    void *getVertices(GLfloat *vertices);
+    void *getVertices(GLfloat *vertices, float scale);
 
     float getHeight(int x, int z);
 

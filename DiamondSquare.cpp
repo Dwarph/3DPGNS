@@ -13,7 +13,6 @@ float roughness;
 vector<vector<float> > heightMap;
 
 
-
 DiamondSquare::DiamondSquare(int max, float roughness) {
     this->maxX = max;       //width
     this->maxZ = max;       //depth
@@ -128,7 +127,7 @@ vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
 }
 
-void *DiamondSquare::getVertices(GLfloat *vertices) {
+void *DiamondSquare::getVertices(GLfloat *vertices, float scale) {
 
     int index = 0;
     //iterates over the depth (z) and the width (x)
@@ -142,17 +141,17 @@ void *DiamondSquare::getVertices(GLfloat *vertices) {
                     switch (i) {
                         case 0:
                             if (j == 0) {
-                                vertices[index] = x;
+                                vertices[index] = x * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x, z);
+                                vertices[index] = this->getHeight(x, z) * scale;
 
                             } else {
-                                vertices[index] = x + 1;
+                                vertices[index] = (x + 1) * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x + 1, z);
+                                vertices[index] = this->getHeight(x + 1, z) * scale;
                             }
                             index++;
-                            vertices[index] = z;
+                            vertices[index] = z * scale;
                             index++;
                             break;
 
@@ -160,37 +159,37 @@ void *DiamondSquare::getVertices(GLfloat *vertices) {
                         case 1:
 
                             if (j == 0) {
-                                vertices[index] = x;
+                                vertices[index] = x * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x, z + 1);
+                                vertices[index] = this->getHeight(x, z + 1) * scale;
                                 index++;
-                                vertices[index] = z + 1;
+                                vertices[index] = (z + 1) * scale;
                                 index++;
                             } else {
-                                vertices[index] = x + 1;
+                                vertices[index] = (x + 1) * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x + 1, z);
+                                vertices[index] = this->getHeight(x + 1, z) * scale;
                                 index++;
-                                vertices[index] = z;
+                                vertices[index] = z * scale;
                                 index++;
                             }
                             break;
                         case 2:
 
                             if (j == 0) {
-                                vertices[index] = x + 1;
+                                vertices[index] = (x + 1) * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x + 1, z + 1);
+                                vertices[index] = this->getHeight(x + 1, z + 1) * scale;
                                 index++;
-                                vertices[index] = z + 1;
+                                vertices[index] = (z + 1) * scale;
                                 index++;
 
                             } else {
-                                vertices[index] = x;
+                                vertices[index] = x * scale;
                                 index++;
-                                vertices[index] = this->getHeight(x, z + 1);
+                                vertices[index] = this->getHeight(x, z + 1) * scale;
                                 index++;
-                                vertices[index] = z + 1;
+                                vertices[index] = (z + 1) * scale;
                                 index++;
                             }
                             break;
@@ -208,6 +207,7 @@ float DiamondSquare::getHeight(int x, int z) {
     newZ = (z == 0) ? 0 : (z + 2 - 1) / 2;
     return heightMap.at(newX).at(newZ);
 }
+
 //http://www.cplusplus.com/forum/beginner/102670/ source
 void DiamondSquare::resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS,
                               const unsigned short COLUMNS) {

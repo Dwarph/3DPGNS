@@ -119,14 +119,14 @@ int openGLMagic() {
     int max = 200;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 0.1);
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 0.5);
 
     //works out the needed number of vertices
     int noOfVertices = ((max) * (max)) * 2 * 3 *
                        3; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
     GLfloat g_vertex_buffer_data[noOfVertices];
 
-    diamondSquare->getVertices(g_vertex_buffer_data);
+    diamondSquare->getVertices(g_vertex_buffer_data, 0.3);
 
     // diamondSquare->getVertices(g_vertex_buffer_data);
 
