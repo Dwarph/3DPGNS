@@ -30,7 +30,7 @@ DiamondSquare::DiamondSquare(int max, float roughness) {
     this->heightMap.at(max - 1).at(max - 1) = max / 2;
     this->heightMap.at(0).at(max - 1) = max / 2;
 
-    this->divide(max);
+    this->divide(max / 2);
 }
 
 
@@ -97,13 +97,12 @@ void DiamondSquare::divide(int size) {
     }
     cout << "===============" << endl;
 
-    int halfSize = size / 2;
-    if (halfSize < 1) {
+    if (size / 2 < 1) {
         return;
     }
+
+    int halfSize = size / 2;
     float scale = roughness * size;
-
-
     float randNum = ((float) randInRange(10)) / 10;
 
     for (int z = halfSize; z < maxZ; z++) {
@@ -127,9 +126,20 @@ vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
 }
 
-void *DiamondSquare::getVertices(GLfloat *vertices, float scale) {
+void *DiamondSquare::getVertices(GLfloat *verticesOne,
+                                 GLfloat *verticesTwo,
+                                 GLfloat *verticesThree,
+                                 GLfloat *verticesFour,
+                                 float scale) {
+
 
     int index = 0;
+    int maxIteration = (((this->maxX) * (this->maxZ)) * 2 * 3 *
+                        3) / 4; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
+    int count = 0;
+
+    GLfloat *vertices = verticesOne;
+
     //iterates over the depth (z) and the width (x)
     //then iterates 3 times for each vertice in a triangle
     //and 2 times for 2 triangles per square
@@ -138,59 +148,54 @@ void *DiamondSquare::getVertices(GLfloat *vertices, float scale) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
 
+                    if (index == maxIteration) {
+                        count++;
+                        index = 0;
+
+
+                        switch (count) {
+                            case 0:
+                                vertices = verticesOne;
+                                break;
+                            case 1:
+                                vertices = verticesTwo;
+                                break;
+                            case 2:
+                                vertices = verticesThree;
+                                break;
+                            case 3:
+                                vertices = verticesFour;
+                                break;
+                        }
+                    }
+
+
                     switch (i) {
                         case 0:
+
                             if (j == 0) {
-                                vertices[index] = x * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x, z) * scale;
 
+                                index = setVertAtPoint(vertices, index, x, z, scale);
                             } else {
-                                vertices[index] = (x + 1) * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x + 1, z) * scale;
+                                index = setVertAtPoint(vertices, index, x + 1, z, scale);
                             }
-                            index++;
-                            vertices[index] = z * scale;
-                            index++;
                             break;
-
 
                         case 1:
 
                             if (j == 0) {
-                                vertices[index] = x * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x, z + 1) * scale;
-                                index++;
-                                vertices[index] = (z + 1) * scale;
-                                index++;
+                                index = setVertAtPoint(vertices, index, x, z + 1, scale);
                             } else {
-                                vertices[index] = (x + 1) * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x + 1, z) * scale;
-                                index++;
-                                vertices[index] = z * scale;
-                                index++;
+                                index = setVertAtPoint(vertices, index, x + 1, z, scale);
                             }
                             break;
+
                         case 2:
 
                             if (j == 0) {
-                                vertices[index] = (x + 1) * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x + 1, z + 1) * scale;
-                                index++;
-                                vertices[index] = (z + 1) * scale;
-                                index++;
-
+                                index = setVertAtPoint(vertices, index, x + 1, z + 1, scale);
                             } else {
-                                vertices[index] = x * scale;
-                                index++;
-                                vertices[index] = this->getHeight(x, z + 1) * scale;
-                                index++;
-                                vertices[index] = (z + 1) * scale;
-                                index++;
+                                index = setVertAtPoint(vertices, index, x, z + 1, scale);
                             }
                             break;
                     }
@@ -198,6 +203,16 @@ void *DiamondSquare::getVertices(GLfloat *vertices, float scale) {
             }
         }
     }
+}
+
+int DiamondSquare::setVertAtPoint(GLfloat *vertices, int index, int x, int z, float scale) {
+    vertices[index] = x * scale;
+    index++;
+    vertices[index] = this->getHeight(x, z) * scale;
+    index++;
+    vertices[index] = z * scale;
+    index++;
+    return index;
 }
 
 

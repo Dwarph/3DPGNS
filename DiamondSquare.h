@@ -20,10 +20,10 @@ public:
 
     void divide(int size);
 
-    void *getVertices(GLfloat *vertices, float scale);
+    void *
+    getVertices(GLfloat *verticesOne, GLfloat *verticesTwo, GLfloat *verticesThree, GLfloat *verticesFour, float scale);
 
     float getHeight(int x, int z);
-
 
 
 private :
@@ -39,6 +39,9 @@ private :
     void diamond_step(int x, int z, int size, float offset);
 
     void resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
+
+    int setVertAtPoint(GLfloat *verts, int index, int x, int z, float scale);
+
 
 };
 

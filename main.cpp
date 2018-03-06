@@ -116,17 +116,22 @@ int openGLMagic() {
 
 
     //our width and depth of our grid
-    int max = 200;
+    int max = 100;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 0.5);
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 0.3);
 
     //works out the needed number of vertices
-    int noOfVertices = ((max) * (max)) * 2 * 3 *
-                       3; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
-    GLfloat g_vertex_buffer_data[noOfVertices];
+    int noOfVertices = (((max) * (max)) * 2 * 3 *
+                        3) / 4; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
+    GLfloat g_vertex_buffer_data_one[noOfVertices];
+    GLfloat g_vertex_buffer_data_two[noOfVertices];
+    GLfloat g_vertex_buffer_data_three[noOfVertices];
+    GLfloat g_vertex_buffer_data_four[noOfVertices];
 
-    diamondSquare->getVertices(g_vertex_buffer_data, 0.3);
+
+    diamondSquare->getVertices(g_vertex_buffer_data_one, g_vertex_buffer_data_two, g_vertex_buffer_data_three,
+                               g_vertex_buffer_data_four, 1.0);
 
     // diamondSquare->getVertices(g_vertex_buffer_data);
 
@@ -138,10 +143,10 @@ int openGLMagic() {
         col /= 100;
         g_color_buffer_data[i] = col;
     }
-
-    //prints out vertices
+//
+////    prints out vertices
 //    for (int i = 0; i < noOfVertices; i++) {
-//        cout << g_vertex_buffer_data[i] << ", ";
+//        cout << g_vertex_buffer_data_one[i] << ", ";
 //        if ((i + 1) % 3 == 0) {
 //            cout << endl;
 //        }
@@ -154,10 +159,28 @@ int openGLMagic() {
 
 
 /** Bind vertices to buffer**/
-    GLuint vertexbuffer;
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    GLuint vertexbufferOne;
+    glGenBuffers(1, &vertexbufferOne);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferOne);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_one), g_vertex_buffer_data_one, GL_STATIC_DRAW);
+
+    GLuint vertexbufferTwo;
+    glGenBuffers(1, &vertexbufferTwo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferTwo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_two), g_vertex_buffer_data_two, GL_STATIC_DRAW);
+
+    GLuint vertexbufferThree;
+    glGenBuffers(1, &vertexbufferThree);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferThree);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_three), g_vertex_buffer_data_three, GL_STATIC_DRAW);
+
+    GLuint vertexbufferFour;
+    glGenBuffers(1, &vertexbufferFour);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferFour);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_four), g_vertex_buffer_data_four, GL_STATIC_DRAW);
+
+
+
 /** bind colours **/
     GLuint colorbuffer;
     glGenBuffers(1, &colorbuffer);
@@ -187,9 +210,9 @@ int openGLMagic() {
         glUniformMatrix4fv(MatrixID,
                            1, GL_FALSE, &MVP[0][0]);
 
-// 1rst attribute buffer : vertices
+// 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferOne);
         glVertexAttribPointer(
                 0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
                 3,                  // size
@@ -214,6 +237,52 @@ int openGLMagic() {
 // Draw the Terrain !
         glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
 
+
+        // 1rst attribute buffer : vertices
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferTwo);
+        glVertexAttribPointer(
+                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_FALSE,           // normalized?
+                0,                  // stride
+                (void *) 0            // array buffer offset
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+//
+//
+        // 1rst attribute buffer : vertices
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferThree);
+        glVertexAttribPointer(
+                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_FALSE,           // normalized?
+                0,                  // stride
+                (void *) 0            // array buffer offset
+        );
+//
+        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+
+
+        // 1rst attribute buffer : vertices
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferFour);
+        glVertexAttribPointer(
+                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_FALSE,           // normalized?
+                0,                  // stride
+                (void *) 0            // array buffer offset
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+
+
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
 
@@ -230,7 +299,11 @@ int openGLMagic() {
             == 0);
 
 // Cleanup VBO and shader
-    glDeleteBuffers(1, &vertexbuffer);
+    glDeleteBuffers(1, &vertexbufferOne);
+    glDeleteBuffers(1, &vertexbufferTwo);
+    glDeleteBuffers(1, &vertexbufferThree);
+    glDeleteBuffers(1, &vertexbufferFour);
+
     glDeleteBuffers(1, &colorbuffer);
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &VertexArrayID);
