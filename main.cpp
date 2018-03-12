@@ -124,10 +124,10 @@ int openGLMagic() {
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
     //our width and depth of our grid
-    int max = (2 * 2 * 2 * 2 * 2) + 1;
+    int max = (2 * 2 * 2 * 2 * 2 * 2 * 2) + 1;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 5);
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 30);
 
     //works out the needed number of vertices
     int noOfVertices = (((max - 1) * (max - 1)) * 2 * 3 *
@@ -173,6 +173,7 @@ int openGLMagic() {
 //        g_color_buffer_data[i-1] = g_vertex_buffer_data_one[i] / maxHeight;
 //        g_color_buffer_data[i+1] = g_vertex_buffer_data_one[i] / maxHeight;
 //        g_color_buffer_data[i] = g_vertex_buffer_data_one[i] / maxHeight;
+//       // cout << g_vertex_buffer_data_one[i] / maxHeight << endl;
 //        //  i++;
 //
 //    }

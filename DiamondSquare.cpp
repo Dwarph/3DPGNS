@@ -29,10 +29,10 @@ DiamondSquare::DiamondSquare(int max, float roughness) {
     }
 
 
-    this->heightMap.at(0).at(0) = 0.5;
-    this->heightMap.at(max - 1).at(0) = 0.5;
-    this->heightMap.at(max - 1).at(max - 1) = 0.5;
-    this->heightMap.at(0).at(max - 1) = 0.5;
+    this->heightMap.at(0).at(0) = randInRange(10) % 10;
+    this->heightMap.at(max - 1).at(0) = randInRange(10) % 10;
+    this->heightMap.at(max - 1).at(max - 1) = randInRange(10) % 10;
+    this->heightMap.at(0).at(max - 1) = randInRange(10) % 10;
 
     this->divide();
 }
@@ -65,8 +65,8 @@ void DiamondSquare::printGrid() {
         for (int i = 0; i < this->maxX; i++) {
 
             if (this->heightMap.at(i).at(j) == 0) {
-                //  cout << " " << " " << "\t";
-                cout << " " << this->heightMap.at(i).at(j) << "\t";
+                cout << " " << " " << "\t";
+                //  cout << " " << this->heightMap.at(i).at(j) << "\t";
 
 
             } else {
@@ -101,6 +101,7 @@ void DiamondSquare::divide() {
         randNum = ((float) randInRange(randInt)) / 100;
 
         int halfSize = stepSize / 2;
+
         // halfSize--;
         // float scale = roughness * stepSize;
 
@@ -109,7 +110,7 @@ void DiamondSquare::divide() {
 
         //   cout << "SCALE: " << scale  << endl;
 
-        cout << "Rand Offset: " << offset * randNum << endl;
+//        cout << "Rand Offset: " << offset * randNum << endl;
 
         //   cout << randNum << endl;
 
@@ -119,17 +120,17 @@ void DiamondSquare::divide() {
                 diamond_step(x, z, stepSize, randNum * roughness);
             }
         }
-
+        cout << "diamond: " << endl;
         printGrid();
 
-        for (int z = 0; z < maxZ - 1; z += halfSize) {
-            int x = isEven ? 0 : halfSize;
-            for (; x < maxX - 1; x += halfSize) {
+        for (int z = 0; z < maxZ; z += halfSize) {
+
+            for (int x = 0; x < maxX; x += halfSize) {
                 square_step(x, z, halfSize, randNum * roughness);
             }
             isEven = !isEven;
-
         }
+        cout << "square: " << endl;
         printGrid();
 
         stepSize /= 2;
@@ -138,23 +139,24 @@ void DiamondSquare::divide() {
 }
 
 void DiamondSquare::square_step(int x, int z, int step, float offset) {
-    int halfStep = step / 2;
     float values[4] = {getValue(x, z),
                        getValue(x, z + step),
                        getValue(x + step, z),
                        getValue(x + step, z + step)};
 
     float average = averageCorners(values);
-    this->heightMap.at(x + halfStep).at(z + halfStep) = average + offset;
+    this->heightMap.at(x).at(z) = average + offset;
 }
 
 void DiamondSquare::diamond_step(int x, int z, int step, float offset) {
+    int halfStep = step / 2;
+
     float values[4] = {getValue(x - step, z),
                        getValue(x + step, z),
                        getValue(x, z + step),
                        getValue(x, z - step)};
     float average = averageCorners(values);
-    this->heightMap.at(x).at(z) = average + offset;
+    this->heightMap.at(x + halfStep).at(z + halfStep) = average + offset;
 }
 
 float DiamondSquare::getValue(int x, int z) {
@@ -282,7 +284,7 @@ int DiamondSquare::randInRange(int range) {
     int randNum = rand() % range + 1;
 
     if (rand() % 3 == 1) {
-        return randNum * 1;
+        return randNum * -1;
     } else {
         return randNum;
     }
