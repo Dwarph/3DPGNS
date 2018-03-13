@@ -37,30 +37,13 @@ DiamondSquare::DiamondSquare(int max, float roughness) {
     this->divide();
 }
 
-float averageCorners(float values[4]) {
-    float average = 0.0;
-    int avgTot = 0;
 
-    for (int i = 0; i < 4; i++) {
-        if (values[i] != 0) {
-            average += values[i];
-            avgTot++;
-        }
-    }
-
-    if (avgTot == 0) {
-        return 0;
-    } else {
-        return average / avgTot;
-    }
-
-}
-
-void DiamondSquare::printGrid() {
+void DiamondSquare::printGrid(string initial) {
 
     std::cout << std::fixed;
     std::cout << std::setprecision(0);
 
+    cout << initial << endl;
     for (int j = 0; j < this->maxZ; j++) {
         for (int i = 0; i < this->maxX; i++) {
 
@@ -80,61 +63,34 @@ void DiamondSquare::printGrid() {
 
 void DiamondSquare::divide() {
 
+    float randNum;
     int stepSize = maxX - 1;
-    bool isEven = true;
-    float offset = 100;
     int randInt = 100;
-    float randNum = ((float) randInRange(randInt)) / 100;;
-
-    //  stepSize--;
-
-
-    float values[4] = {getValue(0, maxX - 1),
-                       getValue(0, maxZ - 1),
-                       getValue(maxX - 1, 0),
-                       getValue(maxZ - 1, 0)};
-    float average = averageCorners(values);
-    this->heightMap.at((maxX - 1) / 2).at((maxZ - 1) / 2) = average + randNum;
-
 
     while (stepSize > 1) {
-        randNum = ((float) randInRange(randInt)) / 100;
 
         int halfSize = stepSize / 2;
+        float scale = roughness * stepSize;
 
-        // halfSize--;
-        // float scale = roughness * stepSize;
-
-
-        //   cout << "stepSize: " << stepSize << endl;
-
-        //   cout << "SCALE: " << scale  << endl;
-
-//        cout << "Rand Offset: " << offset * randNum << endl;
-
-        //   cout << randNum << endl;
-
+        randNum = ((float) randInRange(randInt)) / randInt;
 
         for (int z = 0; z < maxZ - 1; z += stepSize) {
             for (int x = 0; x < maxX - 1; x += stepSize) {
-                diamond_step(x, z, stepSize, randNum * roughness);
+                diamond_step(x, z, stepSize, randNum * scale);
             }
         }
-        cout << "diamond: " << endl;
-        printGrid();
+
+        //   printGrid("diamond: ");
 
         for (int z = 0; z < maxZ; z += halfSize) {
-
             for (int x = 0; x < maxX; x += halfSize) {
-                square_step(x, z, halfSize, randNum * roughness);
+                square_step(x, z, halfSize, randNum * scale);
             }
-            isEven = !isEven;
         }
-        cout << "square: " << endl;
-        printGrid();
+
+        //   printGrid( "square: ");
 
         stepSize /= 2;
-        randInt - 5;
     }
 }
 
@@ -159,6 +115,58 @@ void DiamondSquare::diamond_step(int x, int z, int step, float offset) {
     this->heightMap.at(x + halfStep).at(z + halfStep) = average + offset;
 }
 
+void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int noOfArrays, float scale) {
+
+    int index = 0;
+    int maxIteration = (((this->maxX - 1) * (this->maxZ - 1)) * 2 * 3 * 3) / noOfArrays;
+    //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
+    int count = 0;
+
+
+    //iterates over the depth (z) and the width (x)
+    //then iterates 3 times for each vertice in a triangle
+    //and 2 times for 2 triangles per square
+    for (int z = 0; z < this->maxZ - 1; z++) {
+        for (int x = 0; x < this->maxX - 1; x++) {
+            for (int j = 0; j < 2; j++) {
+                for (int i = 0; i < 3; i++) {
+                    if (index >= maxIteration) {
+                        count++;
+                        index = 0;
+
+                    }
+
+                    switch (i) {
+                        case 0:
+                            if (j == 0) {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x, z, scale);
+                            } else {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z, scale);
+                            }
+                            break;
+
+                        case 1:
+                            if (j == 0) {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x, z + 1, scale);
+                            } else {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z + 1, scale);
+                            }
+                            break;
+
+                        case 2:
+                            if (j == 0) {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z, scale);
+                            } else {
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x, z + 1, scale);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
+
 float DiamondSquare::getValue(int x, int z) {
 
     //this allows for all values to be based off of 4 values, by wrapping the squares and diamonds.
@@ -177,85 +185,30 @@ float DiamondSquare::getValue(int x, int z) {
 
 }
 
+float DiamondSquare::averageCorners(float values[4]) {
+    float average = 0.0;
+    int avgTot = 0;
+
+    for (int i = 0; i < 4; i++) {
+        if (values[i] != 0) {
+            average += values[i];
+            avgTot++;
+        }
+    }
+
+    if (avgTot == 0) {
+        return 0;
+    } else {
+        return average / avgTot;
+    }
+
+}
+
 vector<vector<float>> DiamondSquare::getHeightMap() {
     return heightMap;
 }
 
-void *DiamondSquare::getVertices(GLfloat *verticesOne,
-                                 GLfloat *verticesTwo,
-                                 GLfloat *verticesThree,
-                                 GLfloat *verticesFour,
-                                 float scale) {
-
-    int index = 0;
-    int maxIteration = (((this->maxX - 1) * (this->maxZ - 1)) * 2 * 3 *
-                        3); //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
-    int count = 0;
-
-    GLfloat *vertices = verticesOne;
-
-    //iterates over the depth (z) and the width (x)
-    //then iterates 3 times for each vertice in a triangle
-    //and 2 times for 2 triangles per square
-    for (int z = 0; z < this->maxZ - 1; z++) {
-        for (int x = 0; x < this->maxX - 1; x++) {
-            for (int j = 0; j < 2; j++) {
-                for (int i = 0; i < 3; i++) {
-
-
-//                    if (index >= maxIteration) {
-//                        count++;
-//                        index = 0;
-//
-//
-//                        switch (count) {
-//                            case 0:
-//                                vertices = verticesOne;
-//                                break;
-//                            case 1:
-//                                vertices = verticesTwo;
-//                                break;
-//                            case 2:
-//                                vertices = verticesThree;
-//                                break;
-//                            case 3:
-//                                vertices = verticesFour;
-//                                break;
-//                        }
-//                    }
-                    switch (i) {
-                        case 0:
-                            if (j == 0) {
-                                index = setVertAtPoint(vertices, index, x, z, scale);
-                            } else {
-                                index = setVertAtPoint(vertices, index, x + 1, z, scale);
-                            }
-                            break;
-
-                        case 1:
-                            if (j == 0) {
-                                index = setVertAtPoint(vertices, index, x, z + 1, scale);
-                            } else {
-                                index = setVertAtPoint(vertices, index, x + 1, z + 1, scale);
-                            }
-                            break;
-
-                        case 2:
-
-                            if (j == 0) {
-                                index = setVertAtPoint(vertices, index, x + 1, z, scale);
-                            } else {
-                                index = setVertAtPoint(vertices, index, x, z + 1, scale);
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-int DiamondSquare::setVertAtPoint(GLfloat *vertices, int index, int x, int z, float scale) {
+int DiamondSquare::setVertAtPoint(vector<GLfloat> &vertices, int index, int x, int z, float scale) {
     vertices[index] = x * scale;
     index++;
     vertices[index] = this->getHeight(x, z) * scale;

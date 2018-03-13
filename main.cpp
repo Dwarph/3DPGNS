@@ -11,6 +11,7 @@
 
 // Include GLFW
 #include <glfw3.h>
+#include <math.h>
 
 GLFWwindow *window;
 
@@ -21,6 +22,8 @@ GLFWwindow *window;
 #include "external/OpenGLTutorialUsefulFiles/controls.hpp"
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
+
+#define NO_OF_TERRAIN_VERT_ARRAYS 5
 
 using namespace glm;
 
@@ -123,25 +126,23 @@ int openGLMagic() {
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
+
+    /** DIAMOND SQUARE CODE!!! **/
+
     //our width and depth of our grid
-    int max = (2 * 2 * 2 * 2 * 2 * 2 * 2) + 1;
+    int max = (pow(2, 9)) + 1;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 30);
-
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 1);
     //works out the needed number of vertices
     int noOfVertices = (((max - 1) * (max - 1)) * 2 * 3 *
-                        3); //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
-    GLfloat g_vertex_buffer_data_one[noOfVertices];
-    GLfloat g_vertex_buffer_data_two[noOfVertices];
-    GLfloat g_vertex_buffer_data_three[noOfVertices];
-    GLfloat g_vertex_buffer_data_four[noOfVertices];
+                        3) /
+                       NO_OF_TERRAIN_VERT_ARRAYS; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
+    vector<vector<GLfloat>> gl_terrain_verts;
+    gl_terrain_verts.resize(NO_OF_TERRAIN_VERT_ARRAYS, vector<GLfloat>(noOfVertices, 0));
 
+    diamondSquare->getVertices(gl_terrain_verts, NO_OF_TERRAIN_VERT_ARRAYS, 1);
 
-    diamondSquare->getVertices(g_vertex_buffer_data_one, g_vertex_buffer_data_two, g_vertex_buffer_data_three,
-                               g_vertex_buffer_data_four, 1);
-
-    // diamondSquare->getVertices(g_vertex_buffer_data);
 
     // One color for each vertex. Generated randomly each time.
     GLfloat g_color_buffer_data[noOfVertices];
@@ -162,18 +163,12 @@ int openGLMagic() {
 //        }
 //    }
 //
-//    if (minHeight < 0) {
-//        maxHeight += minHeight * -1;
-//    } else {
-//        maxHeight -= minHeight;
-//    }
 //
-//    for (int i = 1; i < noOfVertices; i++) {
-//        if(g_vertex_buffer_data_one[i] / maxHeight < 0.3){}
-//        g_color_buffer_data[i-1] = g_vertex_buffer_data_one[i] / maxHeight;
-//        g_color_buffer_data[i+1] = g_vertex_buffer_data_one[i] / maxHeight;
+//    for (int i = 1; i < noOfVertices; i += 3) {
+//        g_color_buffer_data[i - 1] = g_vertex_buffer_data_one[i] / maxHeight;
+//        g_color_buffer_data[i + 1] = g_vertex_buffer_data_one[i] / maxHeight;
 //        g_color_buffer_data[i] = g_vertex_buffer_data_one[i] / maxHeight;
-//       // cout << g_vertex_buffer_data_one[i] / maxHeight << endl;
+//        // cout << g_vertex_buffer_data_one[i] / maxHeight << endl;
 //        //  i++;
 //
 //    }
@@ -195,27 +190,13 @@ int openGLMagic() {
 
 
 /** Bind vertices to buffer**/
-    GLuint vertexbufferOne;
-    glGenBuffers(1, &vertexbufferOne);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferOne);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_one), g_vertex_buffer_data_one, GL_STATIC_DRAW);
-
-//    GLuint vertexbufferTwo;
-//    glGenBuffers(1, &vertexbufferTwo);
-//    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferTwo);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_two), g_vertex_buffer_data_two, GL_STATIC_DRAW);
-//
-//    GLuint vertexbufferThree;
-//    glGenBuffers(1, &vertexbufferThree);
-//    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferThree);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_three), g_vertex_buffer_data_three, GL_STATIC_DRAW);
-//
-//    GLuint vertexbufferFour;
-//    glGenBuffers(1, &vertexbufferFour);
-//    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferFour);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data_four), g_vertex_buffer_data_four, GL_STATIC_DRAW);
-
-
+    GLuint vertexBuffers[NO_OF_TERRAIN_VERT_ARRAYS];
+    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+        glGenBuffers(1, &vertexBuffers[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[i]);
+        glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i].size() * sizeof(float), &gl_terrain_verts[i][0],
+                     GL_STATIC_DRAW);
+    }
 
 /** bind colours **/
     GLuint colorbuffer;
@@ -246,19 +227,8 @@ int openGLMagic() {
         glUniformMatrix4fv(MatrixID,
                            1, GL_FALSE, &MVP[0][0]);
 
-// 1st attribute buffer : vertices
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferOne);
-        glVertexAttribPointer(
-                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-                3,                  // size
-                GL_FLOAT,           // type
-                GL_FALSE,           // normalized?
-                0,                  // stride
-                (void *) 0            // array buffer offset
-        );
 
-// 2nd attribute buffer : colors
+        // 2nd attribute buffer : colors
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
         glVertexAttribPointer(
@@ -270,53 +240,27 @@ int openGLMagic() {
                 (void *) 0                          // array buffer offset
         );
 
-// Draw the Terrain !
-        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+
+        for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+            // Attribute buffer - vertices
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[i]);
+            glVertexAttribPointer(
+                    0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+                    3,                  // size
+                    GL_FLOAT,           // type
+                    GL_FALSE,           // normalized?
+                    0,                  // stride
+                    (void *) 0            // array buffer offset
+            );
+
+            // Draw the Terrain !
+            glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+        }
 
 
-//        // 1rst attribute buffer : vertices
-//        glEnableVertexAttribArray(0);
-//        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferTwo);
-//        glVertexAttribPointer(
-//                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-//                3,                  // size
-//                GL_FLOAT,           // type
-//                GL_FALSE,           // normalized?
-//                0,                  // stride
-//                (void *) 0            // array buffer offset
-//        );
-//
-//        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
-////
-////
-//        // 1rst attribute buffer : vertices
-//        glEnableVertexAttribArray(0);
-//        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferThree);
-//        glVertexAttribPointer(
-//                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-//                3,                  // size
-//                GL_FLOAT,           // type
-//                GL_FALSE,           // normalized?
-//                0,                  // stride
-//                (void *) 0            // array buffer offset
-//        );
-////
-//        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
-//
-//
-//        // 1rst attribute buffer : vertices
-//        glEnableVertexAttribArray(0);
-//        glBindBuffer(GL_ARRAY_BUFFER, vertexbufferFour);
-//        glVertexAttribPointer(
-//                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-//                3,                  // size
-//                GL_FLOAT,           // type
-//                GL_FALSE,           // normalized?
-//                0,                  // stride
-//                (void *) 0            // array buffer offset
-//        );
-//
-//        glDrawArrays(GL_TRIANGLES, 0, noOfVertices); // 12*3 indices starting at 0 -> 12 triangles
+
+
 
 
         glDisableVertexAttribArray(0);
@@ -327,19 +271,16 @@ int openGLMagic() {
 
         glfwPollEvents();
 
-    } // Check if the ESC key was pressed or the window was closed
-    while (
-            glfwGetKey(window,
-                       GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-            glfwWindowShouldClose(window)
-            == 0);
+    } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
+
+
+    // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
-    glDeleteBuffers(1, &vertexbufferOne);
-//    glDeleteBuffers(1, &vertexbufferTwo);
-//    glDeleteBuffers(1, &vertexbufferThree);
-//    glDeleteBuffers(1, &vertexbufferFour);
+    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+        glDeleteBuffers(1, &vertexBuffers[i]);
 
+    }
     glDeleteBuffers(1, &colorbuffer);
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &VertexArrayID);
@@ -352,8 +293,6 @@ int openGLMagic() {
 
 
 int main() {
-
-
     return openGLMagic();
 }
 

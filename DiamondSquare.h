@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <GL/glew.h>
+#include <string>
 
 
 using namespace std;
@@ -20,8 +21,7 @@ public:
 
     void divide();
 
-    void *
-    getVertices(GLfloat *verticesOne, GLfloat *verticesTwo, GLfloat *verticesThree, GLfloat *verticesFour, float scale);
+    void getVertices(vector<vector<GLfloat>> &arr, int noOfArrays, float scale);
 
     float getHeight(int x, int z);
 
@@ -41,9 +41,11 @@ private :
 
     void resizeVec(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
-    int setVertAtPoint(GLfloat *verts, int index, int x, int z, float scale);
+    int setVertAtPoint(vector<GLfloat> &verts, int index, int x, int z, float scale);
 
-    void printGrid();
+    void printGrid(string initial);
+
+    float averageCorners(float values[4]);
 
 };
 
