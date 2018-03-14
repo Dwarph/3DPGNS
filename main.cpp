@@ -23,7 +23,7 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define NO_OF_TERRAIN_VERT_ARRAYS 5
+#define NO_OF_TERRAIN_VERT_ARRAYS 16
 
 using namespace glm;
 
@@ -130,14 +130,20 @@ int openGLMagic() {
     /** DIAMOND SQUARE CODE!!! **/
 
     //our width and depth of our grid
-    int max = (pow(2, 9)) + 1;
+
+
+    //8 = 4
+    //9 = 8
+    //10 = 16
+    int max = (pow(2, 10)) + 1;
 
     //creates a new diamondSquare heightMap
     DiamondSquare *diamondSquare = new DiamondSquare(max, 1);
+
     //works out the needed number of vertices
-    int noOfVertices = (((max - 1) * (max - 1)) * 2 * 3 *
-                        3) /
-                       NO_OF_TERRAIN_VERT_ARRAYS; //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
+    //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
+    int noOfVertices = ((((max - 1) * (max - 1)) * 2) / NO_OF_TERRAIN_VERT_ARRAYS) * 3 * 3;
+
     vector<vector<GLfloat>> gl_terrain_verts;
     gl_terrain_verts.resize(NO_OF_TERRAIN_VERT_ARRAYS, vector<GLfloat>(noOfVertices, 0));
 

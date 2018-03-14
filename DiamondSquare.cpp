@@ -118,7 +118,8 @@ void DiamondSquare::diamond_step(int x, int z, int step, float offset) {
 void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int noOfArrays, float scale) {
 
     int index = 0;
-    int maxIteration = (((this->maxX - 1) * (this->maxZ - 1)) * 2 * 3 * 3) / noOfArrays;
+
+    int maxIteration = (((this->maxX - 1) * (this->maxZ - 1) * 2) / noOfArrays) * 3 * 3;
     //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
     int count = 0;
 
@@ -135,7 +136,6 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
                         index = 0;
 
                     }
-
                     switch (i) {
                         case 0:
                             if (j == 0) {
