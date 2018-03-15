@@ -29,6 +29,17 @@ using namespace glm;
 
 using namespace std;
 
+struct colour_list {
+    GLfloat ivy_green[3] = {0.38, 0.47, 0.28};
+    GLfloat moss_green[3] = {0.47, 0.56, 0.28};
+    GLfloat snow_white[3] = {0.94, 0.94, 0.85};
+    GLfloat dusty_brown[3] = {0.65, 0.55, 0.41};
+    GLfloat wet_brown[3] = {0.35, 0.27, 0.2};
+    GLfloat light_grey[3] = {0.85, 0.84, 0.8};
+    GLfloat med_grey[3] = {0.72, 0.68, 0.6};
+};
+
+
 int windowSetup() {
     // Initialise GLFW
     if (!glfwInit()) {
@@ -83,14 +94,26 @@ int windowSetup() {
     // glEnable(GL_CULL_FACE);
 }
 
+GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3], float percentage) {
+
+    GLfloat range;
+
+    for (int i = 0; i < 3; i++) {
+        range = colour_one[i] - colour_two[i];
+        blended_colour[i] = colour_two[i] + (range * percentage);
+    }
+    return blended_colour;
+}
 
 void
 computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuint *diamondSquareColourBuffers,
                                  int noOfVertices) {
-
+    colour_list colours;
     vector<vector<GLfloat>> g_color_buffer_data;
     g_color_buffer_data.resize(NO_OF_TERRAIN_VERT_ARRAYS, vector<GLfloat>(noOfVertices, 0));
+    float minHeight = gl_terrain_verts[0][1], maxHeight = gl_terrain_verts[0][1];
 
+    /*
     for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
         for (int j = 0; j < noOfVertices; j++) {
             GLfloat col = rand() % (101);
@@ -98,12 +121,69 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
             g_color_buffer_data[i][j] = col;
         }
     }
+    */
 
-//    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
-//        for (int j = 0; j < noOfVertices; j++) {
-//            gl_terrain_verts[i][j];
-//        }
-//    }
+    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+        for (int j = 1; j < noOfVertices; j += 3) {
+            if (minHeight > gl_terrain_verts[i][j]) {
+                minHeight = gl_terrain_verts[i][j];
+            }
+
+            if (maxHeight < gl_terrain_verts[i][j]) {
+                maxHeight = gl_terrain_verts[i][j];
+            }
+        }
+    }
+
+    cout << "MAX: " << maxHeight << endl;
+    cout << "MIN: " << minHeight << endl;
+
+
+    float heightRange = maxHeight - minHeight;
+
+
+    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+        for (int j = 1; j < noOfVertices; j += 3) {
+
+            float height = (gl_terrain_verts[i][j] - minHeight) / heightRange;
+
+            if (height < 0.025) {
+                g_color_buffer_data[i][j - 1] = colours.wet_brown[0];
+                g_color_buffer_data[i][j] = colours.wet_brown[1];
+                g_color_buffer_data[i][j + 1] = colours.wet_brown[2];
+
+            } else if (height < 0.05) {
+                g_color_buffer_data[i][j - 1] = colours.dusty_brown[0];
+                g_color_buffer_data[i][j] = colours.dusty_brown[1];
+                g_color_buffer_data[i][j + 1] = colours.dusty_brown[2];
+
+            } else if (height < 0.4) {
+                g_color_buffer_data[i][j - 1] = colours.ivy_green[0];
+                g_color_buffer_data[i][j] = colours.ivy_green[1];
+                g_color_buffer_data[i][j + 1] = colours.ivy_green[2];
+
+            } else if (height < 0.7) {
+                g_color_buffer_data[i][j - 1] = colours.moss_green[0];
+                g_color_buffer_data[i][j] = colours.moss_green[1];
+                g_color_buffer_data[i][j + 1] = colours.moss_green[2];
+
+            } else if (height < 0.8) {
+                g_color_buffer_data[i][j - 1] = colours.med_grey[0];
+                g_color_buffer_data[i][j] = colours.med_grey[1];
+                g_color_buffer_data[i][j + 1] = colours.med_grey[2];
+
+            } else if (height < 0.95) {
+                g_color_buffer_data[i][j - 1] = colours.light_grey[0];
+                g_color_buffer_data[i][j] = colours.light_grey[1];
+                g_color_buffer_data[i][j + 1] = colours.light_grey[2];
+
+            } else if (height < 1) {
+                g_color_buffer_data[i][j - 1] = colours.snow_white[0];
+                g_color_buffer_data[i][j] = colours.snow_white[1];
+                g_color_buffer_data[i][j + 1] = colours.snow_white[2];
+            }
+        }
+    }
 
     for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
         glGenBuffers(1, &diamondSquareColourBuffers[i]);
