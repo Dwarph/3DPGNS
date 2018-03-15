@@ -85,6 +85,14 @@ void DiamondSquare::divide() {
 
         stepSize /= 2;
     }
+
+    float offset = heightMap[0][0];
+    for (int z = 0; z < maxSize; z++) {
+        for (int x = 0; x < maxSize; x++) {
+            heightMap[z][x] -= offset;
+
+        }
+    }
 }
 
 void DiamondSquare::square_step(int x, int z, int step, float offset) {

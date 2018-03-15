@@ -23,7 +23,7 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define NO_OF_TERRAIN_VERT_ARRAYS 4
+#define NO_OF_TERRAIN_VERT_ARRAYS 8
 
 using namespace glm;
 
@@ -198,11 +198,6 @@ void
 computeDiamondSquareVertexBuffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer, DiamondSquare diamondSquare,
                                   int noOfVertices) {
 
-    //8 = 4
-    //9 = 8
-    //10 = 16
-
-
     //works out the needed number of vertices
     //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
 
@@ -243,8 +238,12 @@ int openGLMagic() {
 
     /** DIAMOND SQUARE CODE!!! **/
 
+
+    //8 = 4
+    //9 = 8
+    //10 = 16
     //our width and depth of our grid
-    int max = (pow(2, 8)) + 1;
+    int max = (pow(2, 9)) + 1;
 
     int noOfVertices = ((((max - 1) * (max - 1)) * 2) / NO_OF_TERRAIN_VERT_ARRAYS) * 3 * 3;
 
