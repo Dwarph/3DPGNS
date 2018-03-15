@@ -27,9 +27,11 @@ public:
 
     int randInRange(int range);
 
+    int getMaxSize() const;
+
 private :
 
-    int maxX, maxZ, maxY;
+    int maxSize;
     float roughness;
     vector<vector<float> > heightMap;
 

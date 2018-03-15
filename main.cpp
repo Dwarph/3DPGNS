@@ -85,48 +85,38 @@ int windowSetup() {
 
 
 void
-computeDiamondSquareColourBuffer(GLuint *diamondSquareColourBuffer, DiamondSquare diamondSquare, int noOfVertices) {
+computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuint *diamondSquareColourBuffers,
+                                 int noOfVertices) {
 
-    GLfloat g_color_buffer_data[noOfVertices];
+    vector<vector<GLfloat>> g_color_buffer_data;
+    g_color_buffer_data.resize(NO_OF_TERRAIN_VERT_ARRAYS, vector<GLfloat>(noOfVertices, 0));
 
-    for (int i = 0; i < noOfVertices; i++) {
-        GLfloat col = rand() % (101);
-        col /= 100;
-        g_color_buffer_data[i] = col;
+    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+        for (int j = 0; j < noOfVertices; j++) {
+            GLfloat col = rand() % (101);
+            col /= 100;
+            g_color_buffer_data[i][j] = col;
+        }
     }
 
-//    for (int i = 0; i < size; i++) {
-//        GLfloat height = vertexBuffer[i + 2];
-//        float rand = (diamondSquare->randInRange(25) / 100);
-//
-//        if (height < 0) {
-//            colourBuffer[i] = 0.169f * rand;
-//            i++;
-//            colourBuffer[i] = 0.169f * rand;
-//            i++;
-//            colourBuffer[i] = 0.169f * rand;
-//        } else if (height < maxHeight * 0.6) {
-//            colourBuffer[i] = 0;
-//            i++;
-//            colourBuffer[i] = 0.104f * rand;
-//            i++;
-//            colourBuffer[i] = 0.10f * rand;
+//    for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
+//        for (int j = 0; j < noOfVertices; j++) {
+//            gl_terrain_verts[i][j];
 //        }
-//
-
-
-
 //    }
 
     for (int i = 0; i < NO_OF_TERRAIN_VERT_ARRAYS; i++) {
-        glGenBuffers(1, &diamondSquareColourBuffer[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, diamondSquareColourBuffer[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+        glGenBuffers(1, &diamondSquareColourBuffers[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, diamondSquareColourBuffers[i]);
+        glBufferData(GL_ARRAY_BUFFER, g_color_buffer_data[i].size() * sizeof(float), &g_color_buffer_data[i][0],
+                     GL_STATIC_DRAW);
     }
 }
 
 
-void computeDiamondSquare(GLuint *vertexBuffers, DiamondSquare diamondSquare, int noOfVertices) {
+void
+computeDiamondSquareVertexBuffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer, DiamondSquare diamondSquare,
+                                  int noOfVertices) {
 
     //8 = 4
     //9 = 8
@@ -147,6 +137,8 @@ void computeDiamondSquare(GLuint *vertexBuffers, DiamondSquare diamondSquare, in
         glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i].size() * sizeof(float), &gl_terrain_verts[i][0],
                      GL_STATIC_DRAW);
     }
+
+    computeDiamondSquareColourBuffer(gl_terrain_verts, diamondSquareColourBuffer, noOfVertices);
 
 }
 
@@ -181,13 +173,14 @@ int openGLMagic() {
 
     /** Bind vertices to buffer**/
     GLuint diamondSquareVertexBuffers[NO_OF_TERRAIN_VERT_ARRAYS];
-    computeDiamondSquare(diamondSquareVertexBuffers, *diamondSquare, noOfVertices);
-
-
-    /** bind colours **/
     GLuint diamondSquareColourBuffer[NO_OF_TERRAIN_VERT_ARRAYS];
-    computeDiamondSquareColourBuffer(diamondSquareColourBuffer, *diamondSquare, noOfVertices);
 
+    computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
+                                      noOfVertices);
+
+
+
+    /** Main Draw Loop **/
 
     do {
 

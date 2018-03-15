@@ -9,15 +9,8 @@
 
 using namespace std;
 
-int maxX, maxZ, maxY;
-float roughness;
-vector<vector<float> > heightMap;
-
-
 DiamondSquare::DiamondSquare(int max, float roughness) {
-    this->maxX = max;       //width
-    this->maxZ = max;       //depth
-    this->maxY = (maxX + maxZ) / 3; //height
+    this->maxSize = max;       //width
     this->roughness = roughness;
     resizeVec(heightMap, max, max);
     srand(time(NULL));
@@ -44,8 +37,8 @@ void DiamondSquare::printGrid(string initial) {
     std::cout << std::setprecision(0);
 
     cout << initial << endl;
-    for (int j = 0; j < this->maxZ; j++) {
-        for (int i = 0; i < this->maxX; i++) {
+    for (int j = 0; j < this->maxSize; j++) {
+        for (int i = 0; i < this->maxSize; i++) {
 
             if (this->heightMap.at(i).at(j) == 0) {
                 cout << " " << " " << "\t";
@@ -64,7 +57,7 @@ void DiamondSquare::printGrid(string initial) {
 void DiamondSquare::divide() {
 
     float randNum;
-    int stepSize = maxX - 1;
+    int stepSize = maxSize - 1;
     int randInt = 100;
 
     while (stepSize > 1) {
@@ -74,16 +67,16 @@ void DiamondSquare::divide() {
 
         randNum = ((float) randInRange(randInt)) / randInt;
 
-        for (int z = 0; z < maxZ - 1; z += stepSize) {
-            for (int x = 0; x < maxX - 1; x += stepSize) {
+        for (int z = 0; z < maxSize - 1; z += stepSize) {
+            for (int x = 0; x < maxSize - 1; x += stepSize) {
                 diamond_step(x, z, stepSize, randNum * scale);
             }
         }
 
         //   printGrid("diamond: ");
 
-        for (int z = 0; z < maxZ; z += halfSize) {
-            for (int x = 0; x < maxX; x += halfSize) {
+        for (int z = 0; z < maxSize; z += halfSize) {
+            for (int x = 0; x < maxSize; x += halfSize) {
                 square_step(x, z, halfSize, randNum * scale);
             }
         }
@@ -119,7 +112,7 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
 
     int index = 0;
 
-    int maxIteration = (((this->maxX - 1) * (this->maxZ - 1) * 2) / noOfArrays) * 3 * 3;
+    int maxIteration = (((this->maxSize - 1) * (this->maxSize - 1) * 2) / noOfArrays) * 3 * 3;
     //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
     int count = 0;
 
@@ -127,8 +120,8 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
     //iterates over the depth (z) and the width (x)
     //then iterates 3 times for each vertice in a triangle
     //and 2 times for 2 triangles per square
-    for (int z = 0; z < this->maxZ - 1; z++) {
-        for (int x = 0; x < this->maxX - 1; x++) {
+    for (int z = 0; z < this->maxSize - 1; z++) {
+        for (int x = 0; x < this->maxSize - 1; x++) {
             for (int j = 0; j < 2; j++) {
                 for (int i = 0; i < 3; i++) {
                     if (index >= maxIteration) {
@@ -171,15 +164,15 @@ float DiamondSquare::getValue(int x, int z) {
 
     //this allows for all values to be based off of 4 values, by wrapping the squares and diamonds.
     if (x < 0) {
-        x = this->maxX + x - 1;
-    } else if (x >= this->maxX) {
-        x = x - (this->maxX - 1);
+        x = this->maxSize + x - 1;
+    } else if (x >= this->maxSize) {
+        x = x - (this->maxSize - 1);
     }
 
     if (z < 0) {
-        z = this->maxZ + z - 1;
-    } else if (z >= this->maxZ) {
-        z = z - (this->maxZ - 1);
+        z = this->maxSize + z - 1;
+    } else if (z >= this->maxSize) {
+        z = z - (this->maxSize - 1);
     }
     return this->heightMap.at(x).at(z);
 
@@ -241,6 +234,12 @@ int DiamondSquare::randInRange(int range) {
     } else {
         return randNum;
     }
+
+
+}
+
+int DiamondSquare::getMaxSize() const {
+    return maxSize;
 }
 
 
