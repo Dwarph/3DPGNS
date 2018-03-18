@@ -23,9 +23,9 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 10
-#define ROUGHNESS 10
-#define SCALE 0.01
+#define TERRAIN_SIZE 3
+#define ROUGHNESS 1
+#define SCALE 1
 
 using namespace glm;
 
@@ -195,7 +195,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
                 g_color_buffer_data[i][j] = colours.light_grey[1] * randNum;
                 g_color_buffer_data[i][j + 1] = colours.light_grey[2] * randNum;
 
-            } else if (height < 1) {
+            } else if (height <= 1) {
                 g_color_buffer_data[i][j - 1] = colours.snow_white[0] * randNum;
                 g_color_buffer_data[i][j] = colours.snow_white[1] * randNum;
                 g_color_buffer_data[i][j + 1] = colours.snow_white[2] * randNum;
