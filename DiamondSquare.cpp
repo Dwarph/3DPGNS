@@ -72,7 +72,6 @@ void DiamondSquare::divide() {
                 diamond_step(x, z, stepSize, randNum * scale);
             }
         }
-
         //   printGrid("diamond: ");
 
         for (int z = 0; z < maxSize; z += halfSize) {
@@ -80,7 +79,6 @@ void DiamondSquare::divide() {
                 square_step(x, z, halfSize, randNum * scale);
             }
         }
-
         //   printGrid( "square: ");
 
         stepSize /= 2;
@@ -89,8 +87,7 @@ void DiamondSquare::divide() {
     float offset = heightMap[0][0];
     for (int z = 0; z < maxSize; z++) {
         for (int x = 0; x < maxSize; x++) {
-            heightMap[z][x] -= offset;
-
+            heightMap[z][x] -= offset - 1;
         }
     }
 }
@@ -135,8 +132,8 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
                     if (index >= maxIteration) {
                         count++;
                         index = 0;
-
                     }
+
                     switch (i) {
                         case 0:
                             if (j == 0) {
@@ -177,6 +174,7 @@ float DiamondSquare::getValue(int x, int z) {
         x = x - (this->maxSize - 1);
     }
 
+
     if (z < 0) {
         z = this->maxSize + z - 1;
     } else if (z >= this->maxSize) {
@@ -185,6 +183,7 @@ float DiamondSquare::getValue(int x, int z) {
     return this->heightMap.at(x).at(z);
 
 }
+
 
 float DiamondSquare::averageCorners(float values[4]) {
     float average = 0.0;
@@ -221,7 +220,6 @@ int DiamondSquare::setVertAtPoint(vector<GLfloat> &vertices, int index, int x, i
 
 float DiamondSquare::getHeight(int x, int z) {
     //gets the heights at the appropriate index
-
     return heightMap.at(x).at(z);
 }
 
