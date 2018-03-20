@@ -23,9 +23,9 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 3
-#define ROUGHNESS 1
-#define SCALE 1
+#define TERRAIN_SIZE 10
+#define ROUGHNESS 1.5
+#define SCALE  0.01
 
 using namespace glm;
 
@@ -92,8 +92,11 @@ int windowSetup() {
     glDepthFunc(GL_LESS);
 
 
+    glDepthMask(GL_TRUE);
+
     // Cull triangles which normal is not towards the camera
-//     glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_FRONT);
 }
 
 GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3], float percentage) {

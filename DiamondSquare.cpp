@@ -147,7 +147,7 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
                             if (j == 0) {
                                 index = setVertAtPoint(gl_terrain_verts[count], index, x, z + 1, scale);
                             } else {
-                                index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z + 1, scale);
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x, z + 1, scale);
                             }
                             break;
 
@@ -155,7 +155,7 @@ void DiamondSquare::getVertices(vector<vector<GLfloat>> &gl_terrain_verts, int n
                             if (j == 0) {
                                 index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z, scale);
                             } else {
-                                index = setVertAtPoint(gl_terrain_verts[count], index, x, z + 1, scale);
+                                index = setVertAtPoint(gl_terrain_verts[count], index, x + 1, z + 1, scale);
                             }
                             break;
                     }
