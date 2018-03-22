@@ -24,12 +24,13 @@ GLFWwindow *window;
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
 #define TERRAIN_SIZE 10
-#define ROUGHNESS 1.5
 #define SCALE  0.01
 
 using namespace glm;
 
 using namespace std;
+
+float roughness;
 
 struct colour_list {
     GLfloat ivy_green[3] = {0.38, 0.47, 0.28};
@@ -245,6 +246,7 @@ int openGLMagic() {
         return -1;
     };
 
+
     /** Open GL Setup**/
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
@@ -271,7 +273,7 @@ int openGLMagic() {
     int noOfVertices = ((((max - 1) * (max - 1)) * 2) / getNoOfTerrainVertices()) * 3 * 3;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, ROUGHNESS);
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 17);
 
     /** Bind vertices to buffer**/
     GLuint diamondSquareVertexBuffers[getNoOfTerrainVertices()];

@@ -15,7 +15,7 @@ using namespace std;
 class DiamondSquare {
 
 public:
-    DiamondSquare(int max, float roughness);
+    DiamondSquare(int max, int roughMax);
 
     vector<vector<float>> getHeightMap();
 

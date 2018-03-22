@@ -9,11 +9,16 @@
 
 using namespace std;
 
-DiamondSquare::DiamondSquare(int max, float roughness) {
+DiamondSquare::DiamondSquare(int max, int roughMax) {
     this->maxSize = max;       //width
-    this->roughness = roughness;
+    this->roughness = 0.7;
     resizeVec(heightMap, max, max);
     srand(time(NULL));
+
+    this->roughness = (float) (rand() % (roughMax) + 1);
+    this->roughness = this->roughness * 0.1;
+    cout << "ROUGH: " << this->roughness << endl;
+
 
     for (int i = 0; i < max; i++) {
         for (int j = 0; j < max; j++) {
@@ -64,19 +69,21 @@ void DiamondSquare::divide() {
 
         int halfSize = stepSize / 2;
         float scale = roughness * stepSize;
-
         randNum = ((float) randInRange(randInt)) / randInt;
+        // float offset = randNum * scale;
+        float offset = randNum * scale * 2 - scale;
+
 
         for (int z = 0; z < maxSize - 1; z += stepSize) {
             for (int x = 0; x < maxSize - 1; x += stepSize) {
-                diamond_step(x, z, stepSize, randNum * scale);
+                diamond_step(x, z, stepSize, offset);
             }
         }
         //   printGrid("diamond: ");
 
         for (int z = 0; z < maxSize; z += halfSize) {
             for (int x = 0; x < maxSize; x += halfSize) {
-                square_step(x, z, halfSize, randNum * scale);
+                square_step(x, z, halfSize, offset);
             }
         }
         //   printGrid( "square: ");
