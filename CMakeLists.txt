@@ -61,8 +61,13 @@ add_definitions(
 
 add_executable(3DPGNS
         main.cpp
-        DiamondSquare.cpp
-        DiamondSquare.h
+        diamond_square.cpp
+        diamond_square.h
+        l_system.cpp
+        l_system.h
+
+        world_maker.cpp
+        world_maker.h
 
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp
@@ -71,7 +76,7 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/controls.hpp
 
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
-        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader)
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader world_maker.cpp world_maker.h)
 
 target_link_libraries(3DPGNS
         ${ALL_LIBS}

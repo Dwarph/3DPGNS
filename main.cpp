@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "./DiamondSquare.h"
+#include "./diamond_square.h"
 
 // Include standard headers
 #include <stdio.h>
@@ -23,8 +23,8 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 10
-#define SCALE  0.01
+#define TERRAIN_SIZE 9
+#define SCALE  2
 
 using namespace glm;
 
@@ -273,7 +273,7 @@ int openGLMagic() {
     int noOfVertices = ((((max - 1) * (max - 1)) * 2) / getNoOfTerrainVertices()) * 3 * 3;
 
     //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 17);
+    DiamondSquare *diamondSquare = new DiamondSquare(max, 1);
 
     /** Bind vertices to buffer**/
     GLuint diamondSquareVertexBuffers[getNoOfTerrainVertices()];

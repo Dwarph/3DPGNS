@@ -2,7 +2,7 @@
 // Created by pip on 22/02/18.
 //
 
-#include "DiamondSquare.h"
+#include "diamond_square.h"
 #include <stdlib.h>     /* srand, rand */
 #include <iostream>
 #include <iomanip>
