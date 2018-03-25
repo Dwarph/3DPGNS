@@ -11,12 +11,13 @@ using namespace std;
 
 DiamondSquare::DiamondSquare(int max, int roughMax) {
     this->maxSize = max;       //width
-    this->roughness = 0.7;
+//    this->roughness = 0.09;
     resizeVec(heightMap, max, max);
     srand(time(NULL));
 
     this->roughness = (float) (rand() % (roughMax) + 1);
-    this->roughness = this->roughness * 0.1;
+    this->roughness = this->roughness * 0.01;
+    this->roughness += 0.05;
     cout << "ROUGH: " << this->roughness << endl;
 
 
@@ -27,10 +28,10 @@ DiamondSquare::DiamondSquare(int max, int roughMax) {
     }
 
 
-    this->heightMap.at(0).at(0) = randInRange(10) % 10;
-    this->heightMap.at(max - 1).at(0) = randInRange(10) % 10;
-    this->heightMap.at(max - 1).at(max - 1) = randInRange(10) % 10;
-    this->heightMap.at(0).at(max - 1) = randInRange(10) % 10;
+    this->heightMap.at(0).at(0) = (max * randInRange(10) % 10);
+    this->heightMap.at(max - 1).at(0) = (max * randInRange(10) % 10);
+    this->heightMap.at(max - 1).at(max - 1) = (max * randInRange(10) % 10);
+    this->heightMap.at(0).at(max - 1) = (max * randInRange(10) % 10);
 
     this->divide();
 }
@@ -64,18 +65,25 @@ void DiamondSquare::divide() {
     float randNum;
     int stepSize = maxSize - 1;
     int randInt = 100;
+    int finalStep;
 
     while (stepSize > 1) {
 
         int halfSize = stepSize / 2;
         float scale = roughness * stepSize;
         randNum = ((float) randInRange(randInt)) / randInt;
+        if (randNum < 0) {
+            randNum *= -1;
+        }
         // float offset = randNum * scale;
         float offset = randNum * scale * 2 - scale;
-
+        //  cout << offset << endl;
 
         for (int z = 0; z < maxSize - 1; z += stepSize) {
             for (int x = 0; x < maxSize - 1; x += stepSize) {
+
+                randNum = ((float) randInRange(randInt)) / randInt;
+                offset = randNum * scale * 2 - scale;
                 diamond_step(x, z, stepSize, offset);
             }
         }
@@ -83,18 +91,23 @@ void DiamondSquare::divide() {
 
         for (int z = 0; z < maxSize; z += halfSize) {
             for (int x = 0; x < maxSize; x += halfSize) {
+                randNum = ((float) randInRange(randInt)) / randInt;
+                offset = randNum * scale * 2 - scale;
                 square_step(x, z, halfSize, offset);
             }
         }
         //   printGrid( "square: ");
 
+        if (stepSize / 2 < 1) {
+            finalStep = stepSize;
+        }
         stepSize /= 2;
     }
 
-    float offset = heightMap[0][0];
+    float heightOffset = heightMap[0][0];
     for (int z = 0; z < maxSize; z++) {
         for (int x = 0; x < maxSize; x++) {
-            heightMap[z][x] -= offset - 1;
+            heightMap[z][x] -= heightOffset - 1;
         }
     }
 }
