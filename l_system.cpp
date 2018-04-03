@@ -51,7 +51,7 @@ void L_System::generateVertices() {
     glm::mat4x4 homogenousCoords;
     homogenousCoords[1];
 
-    glm::fvec4 currentPosition = {0, 0, 0, 1};
+    glm::fvec4 currentPosition = {0, 0, 0, 0};
     int levelNum = 1;
     int index = 0;
     float angle = 0;
@@ -62,7 +62,7 @@ void L_System::generateVertices() {
     glm::fmat4 translation;
 
     //xAxis rotationVector
-    translation[3] = {1, 0, 0, 1};
+    translation[3] = {0, 1, 0, 1};
     translation[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
     translation[1] = {0, glm::cos(angle), glm::sin(angle), 0};
     translation[0] = {1, 0, 0, 0};
@@ -70,12 +70,24 @@ void L_System::generateVertices() {
     for (int i = 0; i < this->fractalString.length(); i++) {
         if (this->fractalString[i] == 'F') {
 
+
+            translation[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
+            translation[1] = {0, glm::cos(angle), glm::sin(angle), 0};
+
             for (int j = 0; j < 2; j++) {
                 vertices.push_back(currentPosition.x);
                 vertices.push_back(currentPosition.y);
                 vertices.push_back(currentPosition.z);
+                currentPosition.x = currentPosition.x + glm::cos(angle);
+                currentPosition.y = currentPosition.y + glm::sin(angle);
+                vertices.push_back(currentPosition.x);
+                vertices.push_back(currentPosition.y);
+                vertices.push_back(currentPosition.z);
 
-                if (j == 0) currentPosition = currentPosition * translation;
+
+
+//                if (j == 0) {currentPosition =  translation * currentPosition;}
+//                std::cout << angle;
             }
 
         } else if (this->fractalString[i] == 'f') {

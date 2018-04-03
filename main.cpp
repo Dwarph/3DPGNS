@@ -341,13 +341,14 @@ int openGLMagic() {
     computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
                                       noOfVertices);
 
-    L_System *tree = new L_System("F-F-F-F", 2);
+    L_System *tree = new L_System("F-F-F-F", 3);
 
     Rule rule;
     rule.axiom = 'F';
-    rule.rule = "F+FF-FF-F-F+F+F";
+    rule.rule = "FF-F+F-F-FF";
 
     tree->addRule(rule);
+
     tree->generateFractal();
     tree->generateVertices();
 
@@ -408,7 +409,7 @@ int openGLMagic() {
             );
 
             // Draw the Terrain !
-            glDrawArrays(GL_TRIANGLES, 0, noOfVertices);
+//            glDrawArrays(GL_TRIANGLES, 0, noOfVertices);
         }
 
         glEnableVertexAttribArray(0);
