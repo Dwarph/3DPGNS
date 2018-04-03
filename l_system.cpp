@@ -46,12 +46,13 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
     int levelNum = 1;
     int index = 0;
     float angle = 0;
-    float angleModifier = glm::degrees(6);
+    float angleModifier = glm::degrees(6.0f);
 
     std::vector<glm::fvec4> positionBuffer;
 
-
     glm::fmat4 translation;
+
+    //xAxis rotationVector
     translation[3] = {1, 0, 0, 1};
     translation[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
     translation[1] = {0, glm::cos(angle), glm::sin(angle), 0};
@@ -67,7 +68,7 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
             vertices[index] = currentPosition.z;
             index++;
 
-            currentPosition *= translation;
+            currentPosition = currentPosition * translation;
 
             vertices[index] = currentPosition.x;
             index++;
@@ -77,7 +78,7 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
             index++;
 
         } else if (this->fractalString[i] == 'f') {
-            currentPosition *= translation;
+            currentPosition = currentPosition * translation;
 
         } else if (this->fractalString[i] == '+') {
             angle += angleModifier;

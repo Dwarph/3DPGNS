@@ -23,7 +23,7 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 11
+#define TERRAIN_SIZE 9
 #define SCALE  0.5
 
 using namespace glm;
@@ -313,7 +313,6 @@ int openGLMagic() {
         return -1;
     };
 
-
     /** Open GL Setup**/
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
@@ -329,11 +328,6 @@ int openGLMagic() {
 
     /** DIAMOND SQUARE CODE!!! **/
 
-    //
-    //7 = 2
-    //8 = 4
-    //9 = 8
-    //10 = 16
     //our width and depth of our grid
     int max = (pow(2, TERRAIN_SIZE)) + 1;
 
@@ -348,6 +342,9 @@ int openGLMagic() {
 
     computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
                                       noOfVertices);
+
+//    GLuint treeVertexBuffer = ;
+
 
     /** Main Draw Loop **/
     do {
