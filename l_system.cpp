@@ -5,13 +5,8 @@
 #include <glm/detail/type_mat.hpp>
 #include <glm/detail/type_mat4x4.hpp>
 #include <glm/glm.hpp>
+#include <iostream>
 #include "l_system.h"
-
-std::string seed;
-std::string fractalString;
-int no_of_iterations;
-
-std::vector<Rule> rules;
 
 L_System::L_System(const std::string &seed, int no_of_iterations) {
     this->seed = seed;
@@ -24,20 +19,34 @@ void L_System::addRule(Rule rule) {
     rules.push_back(rule);
 }
 
-std::string L_System::generateFractal() {
+void L_System::generateFractal() {
+    std::string newString = "";
     this->fractalString = this->seed;
+    bool found = false;
+    int size = 0;
 
-    for (int i = 0; i < this->no_of_iterations; i++) {
-        for (int j = 0; i < this->rules.size(); j++) {
-            if (this->fractalString[i] == this->rules[j].axiom) {
-                this->fractalString.replace(i, 1, this->rules[j].rule);
+    for (int n = 0; n < this->no_of_iterations; n++) {
+        for (int i = 0; i < this->fractalString.length(); i++) {
+            for (int j = 0; j < this->rules.size(); j++) {
+                if (this->fractalString[i] == this->rules[j].axiom) {
+                    newString += this->rules[j].rule;
+                    found = true;
+                    break;
+                }
             }
+            if (!found) {
+                newString += this->fractalString[i];
+            }
+            found = false;
+
         }
+        fractalString = newString;
+        newString.empty();
     }
 }
 
 
-void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
+void L_System::generateVertices() {
 
     glm::mat4x4 homogenousCoords;
     homogenousCoords[1];
@@ -46,7 +55,7 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
     int levelNum = 1;
     int index = 0;
     float angle = 0;
-    float angleModifier = glm::degrees(6.0f);
+    float angleModifier = glm::degrees(90.0f);
 
     std::vector<glm::fvec4> positionBuffer;
 
@@ -61,21 +70,13 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
     for (int i = 0; i < this->fractalString.length(); i++) {
         if (this->fractalString[i] == 'F') {
 
-            vertices[index] = currentPosition.x;
-            index++;
-            vertices[index] = currentPosition.y;
-            index++;
-            vertices[index] = currentPosition.z;
-            index++;
+            for (int j = 0; j < 2; j++) {
+                vertices.push_back(currentPosition.x);
+                vertices.push_back(currentPosition.y);
+                vertices.push_back(currentPosition.z);
 
-            currentPosition = currentPosition * translation;
-
-            vertices[index] = currentPosition.x;
-            index++;
-            vertices[index] = currentPosition.y;
-            index++;
-            vertices[index] = currentPosition.z;
-            index++;
+                if (j == 0) currentPosition = currentPosition * translation;
+            }
 
         } else if (this->fractalString[i] == 'f') {
             currentPosition = currentPosition * translation;
@@ -105,6 +106,14 @@ void L_System::getVertsAsLines(std::vector<GLfloat> &vertices) {
             levelNum--;
         }
     }
+}
+
+void L_System::setSeed(const std::string &seed) {
+    L_System::seed = seed;
+}
+
+const std::vector<GLfloat> &L_System::getVertices() const {
+    return vertices;
 }
 
 

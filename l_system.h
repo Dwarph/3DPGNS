@@ -22,11 +22,15 @@ public:
 
     L_System(const std::string &seed, int no_of_iterations);
 
-    std::string generateFractal();
+    void generateFractal();
 
     void addRule(Rule rule);
 
-    void getVertsAsLines(std::vector<GLfloat> &gl_terrain_verts);
+    void generateVertices();
+
+    void setSeed(const std::string &seed);
+
+    const std::vector<GLfloat> &getVertices() const;
 
 
 private:
@@ -35,6 +39,7 @@ private:
     std::string fractalString;
     int no_of_iterations;
     std::vector<Rule> rules;
+    std::vector<GLfloat> vertices;
 };
 
 

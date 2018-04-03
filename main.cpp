@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "./diamond_square.h"
+#include "./l_system.h"
 
 // Include standard headers
 #include <stdio.h>
@@ -112,7 +113,7 @@ GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat
     return blended_colour;
 }
 
-int getNoOfTerrainVertices() {
+int getNoOfTerrainVertexArrays() {
 
     if (TERRAIN_SIZE < 7) {
         return 1;
@@ -128,10 +129,10 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
                                  int noOfVertices) {
     colour_list colours;
     vector<vector<GLfloat>> g_color_buffer_data;
-    g_color_buffer_data.resize(getNoOfTerrainVertices(), vector<GLfloat>(noOfVertices, 0));
+    g_color_buffer_data.resize(getNoOfTerrainVertexArrays(), vector<GLfloat>(noOfVertices, 0));
     float minHeight = gl_terrain_verts[0][1], maxHeight = gl_terrain_verts[0][1];
 
-    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
         for (int j = 1; j < noOfVertices; j += 3) {
             if (minHeight > gl_terrain_verts[i][j]) {
                 minHeight = gl_terrain_verts[i][j];
@@ -151,7 +152,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
     float height, randNum;
 
 //      Rainbow Texture
-//    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
 //        for (int j = 0; j < noOfVertices; j++) {
 //            GLfloat col = rand() % (101);
 //            col /= 100;
@@ -160,7 +161,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 //    }
 
     //Greyscale Texture
-//    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
 //        for (int j = 1; j < noOfVertices; j += 3) {
 //            g_color_buffer_data[i][j - 1] = (gl_terrain_verts[i][j] - minHeight) / heightRange;
 //            g_color_buffer_data[i][j ] = (gl_terrain_verts[i][j] - minHeight) / heightRange;
@@ -170,7 +171,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 
 
     GLfloat blended_colour[3];
-    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
         for (int j = 1; j < noOfVertices; j += 3) {
             int min = 97, max = 103;
 
@@ -218,7 +219,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
         }
     }
 //
-//    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
 //        for (int j = 1; j < noOfVertices; j += 3) {
 //            int min = 97, max = 103;
 //
@@ -275,7 +276,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 //        }
 //    }
 
-    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
         glGenBuffers(1, &diamondSquareColourBuffers[i]);
         glBindBuffer(GL_ARRAY_BUFFER, diamondSquareColourBuffers[i]);
         glBufferData(GL_ARRAY_BUFFER, g_color_buffer_data[i].size() * sizeof(float), &g_color_buffer_data[i][0],
@@ -288,15 +289,12 @@ void
 computeDiamondSquareVertexBuffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer, DiamondSquare diamondSquare,
                                   int noOfVertices) {
 
-    //works out the needed number of vertices
-    //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points.
-
     vector<vector<GLfloat>> gl_terrain_verts;
-    gl_terrain_verts.resize(getNoOfTerrainVertices(), vector<GLfloat>(noOfVertices, 0));
+    gl_terrain_verts.resize(getNoOfTerrainVertexArrays(), vector<GLfloat>(noOfVertices, 0));
 
-    diamondSquare.getVertices(gl_terrain_verts, getNoOfTerrainVertices(), SCALE);
+    diamondSquare.getVertices(gl_terrain_verts, getNoOfTerrainVertexArrays(), SCALE);
 
-    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
         glGenBuffers(1, &vertexBuffers[i]);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[i]);
         glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i].size() * sizeof(float), &gl_terrain_verts[i][0],
@@ -331,19 +329,35 @@ int openGLMagic() {
     //our width and depth of our grid
     int max = (pow(2, TERRAIN_SIZE)) + 1;
 
-    int noOfVertices = ((((max - 1) * (max - 1)) * 2) / getNoOfTerrainVertices()) * 3 * 3;
+    int noOfVertices = ((((max - 1) * (max - 1)) * 2) / getNoOfTerrainVertexArrays()) * 3 * 3;
 
     //creates a new diamondSquare heightMap
     DiamondSquare *diamondSquare = new DiamondSquare(max, 10);
 
     /** Bind vertices to buffer**/
-    GLuint diamondSquareVertexBuffers[getNoOfTerrainVertices()];
-    GLuint diamondSquareColourBuffer[getNoOfTerrainVertices()];
+    GLuint diamondSquareVertexBuffers[getNoOfTerrainVertexArrays()];
+    GLuint diamondSquareColourBuffer[getNoOfTerrainVertexArrays()];
 
     computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
                                       noOfVertices);
 
-//    GLuint treeVertexBuffer = ;
+    L_System *tree = new L_System("F-F-F-F", 2);
+
+    Rule rule;
+    rule.axiom = 'F';
+    rule.rule = "F+FF-FF-F-F+F+F";
+
+    tree->addRule(rule);
+    tree->generateFractal();
+    tree->generateVertices();
+
+
+    GLuint treeVertexBuffer;
+    glGenBuffers(1, &treeVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, treeVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, tree->getVertices().size() * sizeof(float), &tree->getVertices()[0],
+                 GL_STATIC_DRAW);
+
 
 
     /** Main Draw Loop **/
@@ -368,7 +382,7 @@ int openGLMagic() {
 // in the "MVP" uniform
 
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-        for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+        for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, diamondSquareVertexBuffers[i]);
@@ -397,6 +411,18 @@ int openGLMagic() {
             glDrawArrays(GL_TRIANGLES, 0, noOfVertices);
         }
 
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, treeVertexBuffer);
+        glVertexAttribPointer(
+                0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_FALSE,           // normalized?
+                0,                  // stride
+                (void *) 0            // array buffer offset
+        );
+        glDrawArrays(GL_LINES, 0, tree->getVertices().size() / 3);
+
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
 
@@ -408,7 +434,7 @@ int openGLMagic() {
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
-    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
         glDeleteBuffers(1, &diamondSquareVertexBuffers[i]);
         glDeleteBuffers(1, &diamondSquareColourBuffer[i]);
     }
