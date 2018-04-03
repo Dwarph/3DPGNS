@@ -23,8 +23,8 @@ GLFWwindow *window;
 
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 10
-#define SCALE  0.01
+#define TERRAIN_SIZE 11
+#define SCALE  0.5
 
 using namespace glm;
 
@@ -50,6 +50,7 @@ int windowSetup() {
         getchar();
         return -1;
     }
+
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -216,7 +217,7 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 
         }
     }
-
+//
 //    for (int i = 0; i < getNoOfTerrainVertices(); i++) {
 //        for (int j = 1; j < noOfVertices; j += 3) {
 //            int min = 97, max = 103;
@@ -239,9 +240,9 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 //                g_color_buffer_data[i][j + 1] = blended_colour[2] * randNum;
 //
 //
-//            } else if (height < 0.4) {
+//            } else if (height < 0.7) {
 //
-//                getBlendedColours(colours.moss_green, colours.ivy_green, blended_colour, height / 0.4);
+//                getBlendedColours(colours.moss_green, colours.ivy_green, blended_colour, height / 0.7);
 //
 //                g_color_buffer_data[i][j - 1] = blended_colour[0] * randNum;
 //                g_color_buffer_data[i][j] = blended_colour[1] * randNum;
@@ -348,7 +349,6 @@ int openGLMagic() {
     computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
                                       noOfVertices);
 
-
     /** Main Draw Loop **/
     do {
 
@@ -366,12 +366,11 @@ int openGLMagic() {
         mat4 ModelMatrix = glm::mat4(1.0);
         mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-
 /** Terrain display commands**/
 // Send our transformation to the currently bound shader,
 // in the "MVP" uniform
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         for (int i = 0; i < getNoOfTerrainVertices(); i++) {
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
@@ -409,8 +408,6 @@ int openGLMagic() {
         glfwPollEvents();
 
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
-
-
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader

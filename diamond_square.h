@@ -9,8 +9,12 @@
 #include <GL/glew.h>
 #include <string>
 
+#include <stdlib.h>     /* srand, rand */
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
+
 
 class DiamondSquare {
 

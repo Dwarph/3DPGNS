@@ -1,13 +1,8 @@
 //
 // Created by pip on 22/02/18.
 //
-
 #include "diamond_square.h"
-#include <stdlib.h>     /* srand, rand */
-#include <iostream>
-#include <iomanip>
 
-using namespace std;
 
 DiamondSquare::DiamondSquare(int max, int roughMax) {
     this->maxSize = max;       //width
@@ -75,6 +70,10 @@ void DiamondSquare::divide() {
         if (randNum < 0) {
             randNum *= -1;
         }
+
+//        if(stepSize/2 < 1){
+//            randNum = 1;
+//        }
         // float offset = randNum * scale;
         float offset = randNum * scale * 2 - scale;
         //  cout << offset << endl;
@@ -98,9 +97,7 @@ void DiamondSquare::divide() {
         }
         //   printGrid( "square: ");
 
-        if (stepSize / 2 < 1) {
-            finalStep = stepSize;
-        }
+
         stepSize /= 2;
     }
 
