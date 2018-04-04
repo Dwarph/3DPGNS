@@ -8,10 +8,11 @@
 #include <iostream>
 #include "l_system.h"
 
-L_System::L_System(const std::string &seed, int no_of_iterations) {
+L_System::L_System(const std::string &seed, int no_of_iterations, float angleMod) {
     this->seed = seed;
     this->no_of_iterations = no_of_iterations;
     this->fractalString = this->seed;
+    this->angleMod = glm::radians(angleMod);
 }
 
 
@@ -20,16 +21,23 @@ void L_System::addRule(Rule rule) {
 }
 
 void L_System::generateFractal() {
+    //could replace "rules" with a hashmap
+
     std::string newString = "";
     this->fractalString = this->seed;
     bool found = false;
     int size = 0;
 
     for (int n = 0; n < this->no_of_iterations; n++) {
+
+        if (n == 4) {
+            rand();
+        }
+
         for (int i = 0; i < this->fractalString.length(); i++) {
             for (int j = 0; j < this->rules.size(); j++) {
                 if (this->fractalString[i] == this->rules[j].axiom) {
-                    newString += this->rules[j].rule;
+                    newString.append(this->rules[j].rule);
                     found = true;
                     break;
                 }
@@ -41,7 +49,7 @@ void L_System::generateFractal() {
 
         }
         fractalString = newString;
-        newString.empty();
+        newString = "";
     }
 }
 
@@ -55,31 +63,30 @@ void L_System::generateVertices() {
     int levelNum = 1;
     int index = 0;
     float angle = 0;
-    float angleModifier = glm::degrees(90.0f);
 
     std::vector<glm::fvec4> positionBuffer;
+    std::vector<float> angleBuffer;
 
-    glm::fmat4 translation;
+    glm::fmat4 translationMatrix;
 
     //xAxis rotationVector
-    translation[3] = {0, 1, 0, 1};
-    translation[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
-    translation[1] = {0, glm::cos(angle), glm::sin(angle), 0};
-    translation[0] = {1, 0, 0, 0};
+    translationMatrix[3] = {0, 1, 0, 1};
+    translationMatrix[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
+    translationMatrix[1] = {0, glm::cos(angle), glm::sin(angle), 0};
+    translationMatrix[0] = {1, 0, 0, 0};
 
     for (int i = 0; i < this->fractalString.length(); i++) {
         if (this->fractalString[i] == 'F') {
 
-
-            translation[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
-            translation[1] = {0, glm::cos(angle), glm::sin(angle), 0};
+            translationMatrix[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
+            translationMatrix[1] = {0, glm::cos(angle), glm::sin(angle), 0};
 
             for (int j = 0; j < 2; j++) {
                 vertices.push_back(currentPosition.x);
                 vertices.push_back(currentPosition.y);
                 vertices.push_back(currentPosition.z);
-                currentPosition.x = currentPosition.x + glm::cos(angle);
-                currentPosition.y = currentPosition.y + glm::sin(angle);
+                currentPosition.x = currentPosition.x + (glm::cos(angle));
+                currentPosition.y = currentPosition.y + (glm::sin(angle));
                 vertices.push_back(currentPosition.x);
                 vertices.push_back(currentPosition.y);
                 vertices.push_back(currentPosition.z);
@@ -91,13 +98,27 @@ void L_System::generateVertices() {
             }
 
         } else if (this->fractalString[i] == 'f') {
-            currentPosition = currentPosition * translation;
+            currentPosition = currentPosition * translationMatrix;
 
         } else if (this->fractalString[i] == '+') {
-            angle += angleModifier;
+            if (glm::degrees(angle + angleMod) > 360) {
+                //prevents precision loss when dealing with large angles
+                angle += this->angleMod - glm::radians(360.0f);
+            } else {
+                angle += this->angleMod;
+            }
+
+//            std::cout << "Angle+: " << glm::degrees(angle) << std::endl;
 
         } else if (this->fractalString[i] == '-') {
-            angle -= angleModifier;
+            if (glm::degrees(angle - angleMod) < 0) {
+                //prevents precision loss when dealing with large angles
+                angle = (angle - this->angleMod) + glm::radians(360.0f);
+            } else {
+                angle -= this->angleMod;
+            }
+
+//            std::cout << "Angle-: " << glm::degrees(angle) << std::endl;
 
         } else if (this->fractalString[i] == '&') {
 
@@ -111,10 +132,13 @@ void L_System::generateVertices() {
 
         } else if (this->fractalString[i] == '[') {
             positionBuffer.push_back(currentPosition);
+            angleBuffer.push_back(angle);
             levelNum++;
         } else if (this->fractalString[i] == ']') {
             currentPosition = positionBuffer.back();
+            angle = angleBuffer.back();
             positionBuffer.pop_back();
+            angleBuffer.pop_back();
             levelNum--;
         }
     }

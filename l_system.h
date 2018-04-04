@@ -20,7 +20,7 @@ class L_System {
 
 public:
 
-    L_System(const std::string &seed, int no_of_iterations);
+    L_System(const std::string &seed, int no_of_iterations, float angleMod);
 
     void generateFractal();
 
@@ -40,6 +40,9 @@ private:
     int no_of_iterations;
     std::vector<Rule> rules;
     std::vector<GLfloat> vertices;
+    float angleMod;
+
+    float getLineLength(int length);
 };
 
 

@@ -152,13 +152,13 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
     float height, randNum;
 
 //      Rainbow Texture
-//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-//        for (int j = 0; j < noOfVertices; j++) {
-//            GLfloat col = rand() % (101);
-//            col /= 100;
-//            g_color_buffer_data[i][j] = col;
-//        }
-//    }
+    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
+        for (int j = 0; j < noOfVertices; j++) {
+            GLfloat col = rand() % (101);
+            col /= 100;
+            g_color_buffer_data[i][j] = col;
+        }
+    }
 
     //Greyscale Texture
 //    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
@@ -171,53 +171,53 @@ computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuin
 
 
     GLfloat blended_colour[3];
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-        for (int j = 1; j < noOfVertices; j += 3) {
-            int min = 97, max = 103;
-
-            height = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-            randNum = (float) (rand() % (max + 1 - min) + min);
-            randNum /= 100;
-
-
-            if (height < 0.025) {
-                g_color_buffer_data[i][j - 1] = colours.wet_brown[0] * randNum;
-                g_color_buffer_data[i][j] = colours.wet_brown[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.wet_brown[2] * randNum;
-
-            } else if (height < 0.05) {
-                g_color_buffer_data[i][j - 1] = colours.dusty_brown[0] * randNum;
-                g_color_buffer_data[i][j] = colours.dusty_brown[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.dusty_brown[2] * randNum;
-
-            } else if (height < 0.4) {
-                g_color_buffer_data[i][j - 1] = colours.ivy_green[0] * randNum;
-                g_color_buffer_data[i][j] = colours.ivy_green[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.ivy_green[2] * randNum;
-
-            } else if (height < 0.7) {
-                g_color_buffer_data[i][j - 1] = colours.moss_green[0] * randNum;
-                g_color_buffer_data[i][j] = colours.moss_green[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.moss_green[2] * randNum;
-
-            } else if (height < 0.8) {
-                g_color_buffer_data[i][j - 1] = colours.med_grey[0] * randNum;
-                g_color_buffer_data[i][j] = colours.med_grey[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.med_grey[2] * randNum;
-
-            } else if (height < 0.95) {
-                g_color_buffer_data[i][j - 1] = colours.light_grey[0] * randNum;
-                g_color_buffer_data[i][j] = colours.light_grey[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.light_grey[2] * randNum;
-
-            } else if (height <= 1) {
-                g_color_buffer_data[i][j - 1] = colours.snow_white[0] * randNum;
-                g_color_buffer_data[i][j] = colours.snow_white[1] * randNum;
-                g_color_buffer_data[i][j + 1] = colours.snow_white[2] * randNum;
-            }
-
-        }
-    }
+//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
+//        for (int j = 1; j < noOfVertices; j += 3) {
+//            int min = 97, max = 103;
+//
+//            height = (gl_terrain_verts[i][j] - minHeight) / heightRange;
+//            randNum = (float) (rand() % (max + 1 - min) + min);
+//            randNum /= 100;
+//
+//
+//            if (height < 0.025) {
+//                g_color_buffer_data[i][j - 1] = colours.wet_brown[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.wet_brown[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.wet_brown[2] * randNum;
+//
+//            } else if (height < 0.05) {
+//                g_color_buffer_data[i][j - 1] = colours.dusty_brown[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.dusty_brown[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.dusty_brown[2] * randNum;
+//
+//            } else if (height < 0.4) {
+//                g_color_buffer_data[i][j - 1] = colours.ivy_green[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.ivy_green[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.ivy_green[2] * randNum;
+//
+//            } else if (height < 0.7) {
+//                g_color_buffer_data[i][j - 1] = colours.moss_green[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.moss_green[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.moss_green[2] * randNum;
+//
+//            } else if (height < 0.8) {
+//                g_color_buffer_data[i][j - 1] = colours.med_grey[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.med_grey[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.med_grey[2] * randNum;
+//
+//            } else if (height < 0.95) {
+//                g_color_buffer_data[i][j - 1] = colours.light_grey[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.light_grey[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.light_grey[2] * randNum;
+//
+//            } else if (height <= 1) {
+//                g_color_buffer_data[i][j - 1] = colours.snow_white[0] * randNum;
+//                g_color_buffer_data[i][j] = colours.snow_white[1] * randNum;
+//                g_color_buffer_data[i][j + 1] = colours.snow_white[2] * randNum;
+//            }
+//
+//        }
+//    }
 //
 //    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
 //        for (int j = 1; j < noOfVertices; j += 3) {
@@ -341,13 +341,19 @@ int openGLMagic() {
     computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
                                       noOfVertices);
 
-    L_System *tree = new L_System("F-F-F-F", 3);
+    L_System *tree = new L_System("X", 7, 20);
 
     Rule rule;
-    rule.axiom = 'F';
-    rule.rule = "FF-F+F-F-FF";
+    rule.axiom = 'X';
+    rule.rule = "F[+X]F[-X]+X";
 
     tree->addRule(rule);
+
+    rule.axiom = 'F';
+    rule.rule = "FF";
+
+    tree->addRule(rule);
+
 
     tree->generateFractal();
     tree->generateVertices();
