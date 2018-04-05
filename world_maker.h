@@ -60,7 +60,7 @@ private:
     vertex_colour_real_blended(vector<vector<GLfloat>> &g_color_buffer_data, vector<vector<GLfloat>> gl_terrain_verts,
                                colour_list colours, float min_height, float max_height);
 
-    GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3], float percent);
+    GLfloat *get_blended_colour(GLfloat *colour_one, GLfloat *colour_two, GLfloat *blended_colour, float percent);
 
 };
 

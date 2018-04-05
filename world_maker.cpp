@@ -195,7 +195,7 @@ void world_maker::vertex_colour_real_blended(vector<vector<GLfloat>> &g_color_bu
 
 
             } else if (height < 0.05) {
-                getBlendedColours(colours.dusty_brown, colours.wet_brown, blended_colour, height / 0.05);
+                this->get_blended_colour(colours.dusty_brown, colours.wet_brown, blended_colour, height / 0.05);
                 g_color_buffer_data[i][j - 1] = blended_colour[0] * rand_num;
                 g_color_buffer_data[i][j] = blended_colour[1] * rand_num;
                 g_color_buffer_data[i][j + 1] = blended_colour[2] * rand_num;
@@ -203,7 +203,7 @@ void world_maker::vertex_colour_real_blended(vector<vector<GLfloat>> &g_color_bu
 
             } else if (height < 0.7) {
 
-                getBlendedColours(colours.moss_green, colours.ivy_green, blended_colour, height / 0.7);
+                this->get_blended_colour(colours.moss_green, colours.ivy_green, blended_colour, height / 0.7);
 
                 g_color_buffer_data[i][j - 1] = blended_colour[0] * rand_num;
                 g_color_buffer_data[i][j] = blended_colour[1] * rand_num;
@@ -238,7 +238,8 @@ void world_maker::vertex_colour_real_blended(vector<vector<GLfloat>> &g_color_bu
 }
 
 
-GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3], float percentage) {
+GLfloat *world_maker::get_blended_colour(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3],
+                                         float percentage) {
 
     GLfloat range;
 
