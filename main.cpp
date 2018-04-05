@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "./diamond_square.h"
 #include "./l_system.h"
+#include "world_maker.h"
 
 // Include standard headers
 #include <stdio.h>
@@ -12,36 +12,17 @@
 
 // Include GLFW
 #include <glfw3.h>
-#include <math.h>
 
 GLFWwindow *window;
 
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include "external/OpenGLTutorialUsefulFiles/controls.hpp"
-
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
 
-#define TERRAIN_SIZE 9
-#define SCALE  0.5
-
 using namespace glm;
-
 using namespace std;
-
-float roughness;
-
-struct colour_list {
-    GLfloat ivy_green[3] = {0.38, 0.47, 0.28};
-    GLfloat moss_green[3] = {0.47, 0.56, 0.28};
-    GLfloat snow_white[3] = {0.94, 0.94, 0.85};
-    GLfloat dusty_brown[3] = {0.65, 0.55, 0.41};
-    GLfloat wet_brown[3] = {0.35, 0.27, 0.2};
-    GLfloat light_grey[3] = {0.85, 0.84, 0.8};
-    GLfloat med_grey[3] = {0.72, 0.68, 0.6};
-};
 
 
 int windowSetup() {
@@ -102,210 +83,6 @@ int windowSetup() {
 //    glCullFace(GL_FRONT);
 }
 
-GLfloat *getBlendedColours(GLfloat colour_one[3], GLfloat colour_two[3], GLfloat blended_colour[3], float percentage) {
-
-    GLfloat range;
-
-    for (int i = 0; i < 3; i++) {
-        range = colour_one[i] - colour_two[i];
-        blended_colour[i] = colour_two[i] + (range * percentage);
-    }
-    return blended_colour;
-}
-
-int getNoOfTerrainVertexArrays() {
-
-    if (TERRAIN_SIZE < 7) {
-        return 1;
-    } else {
-        return pow(2, (TERRAIN_SIZE - 6));
-    }
-
-}
-
-
-void
-computeDiamondSquareColourBuffer(vector<vector<GLfloat>> gl_terrain_verts, GLuint *diamondSquareColourBuffers,
-                                 int noOfVertices) {
-    colour_list colours;
-    vector<vector<GLfloat>> g_color_buffer_data;
-    g_color_buffer_data.resize(getNoOfTerrainVertexArrays(), vector<GLfloat>(noOfVertices, 0));
-    float minHeight = gl_terrain_verts[0][1], maxHeight = gl_terrain_verts[0][1];
-
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-        for (int j = 1; j < noOfVertices; j += 3) {
-            if (minHeight > gl_terrain_verts[i][j]) {
-                minHeight = gl_terrain_verts[i][j];
-            }
-
-            if (maxHeight < gl_terrain_verts[i][j]) {
-                maxHeight = gl_terrain_verts[i][j];
-            }
-        }
-    }
-
-
-    cout << "MAX: " << maxHeight << endl;
-    cout << "MIN: " << minHeight << endl;
-
-    float heightRange = maxHeight - minHeight;
-    float height, randNum;
-
-//      Rainbow Texture
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-        for (int j = 0; j < noOfVertices; j++) {
-            GLfloat col = rand() % (101);
-            col /= 100;
-            g_color_buffer_data[i][j] = col;
-        }
-    }
-
-    //Greyscale Texture
-//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-//        for (int j = 1; j < noOfVertices; j += 3) {
-//            g_color_buffer_data[i][j - 1] = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-//            g_color_buffer_data[i][j ] = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-//            g_color_buffer_data[i][j + 1] = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-//        }
-//    }
-
-
-    GLfloat blended_colour[3];
-//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-//        for (int j = 1; j < noOfVertices; j += 3) {
-//            int min = 97, max = 103;
-//
-//            height = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-//            randNum = (float) (rand() % (max + 1 - min) + min);
-//            randNum /= 100;
-//
-//
-//            if (height < 0.025) {
-//                g_color_buffer_data[i][j - 1] = colours.wet_brown[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.wet_brown[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.wet_brown[2] * randNum;
-//
-//            } else if (height < 0.05) {
-//                g_color_buffer_data[i][j - 1] = colours.dusty_brown[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.dusty_brown[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.dusty_brown[2] * randNum;
-//
-//            } else if (height < 0.4) {
-//                g_color_buffer_data[i][j - 1] = colours.ivy_green[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.ivy_green[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.ivy_green[2] * randNum;
-//
-//            } else if (height < 0.7) {
-//                g_color_buffer_data[i][j - 1] = colours.moss_green[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.moss_green[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.moss_green[2] * randNum;
-//
-//            } else if (height < 0.8) {
-//                g_color_buffer_data[i][j - 1] = colours.med_grey[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.med_grey[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.med_grey[2] * randNum;
-//
-//            } else if (height < 0.95) {
-//                g_color_buffer_data[i][j - 1] = colours.light_grey[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.light_grey[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.light_grey[2] * randNum;
-//
-//            } else if (height <= 1) {
-//                g_color_buffer_data[i][j - 1] = colours.snow_white[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.snow_white[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.snow_white[2] * randNum;
-//            }
-//
-//        }
-//    }
-//
-//    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-//        for (int j = 1; j < noOfVertices; j += 3) {
-//            int min = 97, max = 103;
-//
-//            height = (gl_terrain_verts[i][j] - minHeight) / heightRange;
-//            randNum = (float) (rand() % (max + 1 - min) + min);
-//            randNum /= 100;
-//
-//
-//            if (height < 0.025) {
-//                g_color_buffer_data[i][j - 1] = colours.wet_brown[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.wet_brown[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.wet_brown[2] * randNum;
-//
-//
-//            } else if (height < 0.05) {
-//                getBlendedColours(colours.dusty_brown, colours.wet_brown, blended_colour, height / 0.05);
-//                g_color_buffer_data[i][j - 1] = blended_colour[0] * randNum;
-//                g_color_buffer_data[i][j] = blended_colour[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = blended_colour[2] * randNum;
-//
-//
-//            } else if (height < 0.7) {
-//
-//                getBlendedColours(colours.moss_green, colours.ivy_green, blended_colour, height / 0.7);
-//
-//                g_color_buffer_data[i][j - 1] = blended_colour[0] * randNum;
-//                g_color_buffer_data[i][j] = blended_colour[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = blended_colour[2] * randNum;
-//
-//            } else if (height < 0.7) {
-//
-//
-//                g_color_buffer_data[i][j - 1] = colours.moss_green[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.moss_green[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.moss_green[2] * randNum;
-//
-//            } else if (height < 0.8) {
-//
-//                g_color_buffer_data[i][j - 1] = colours.med_grey[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.med_grey[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.med_grey[2] * randNum;
-//
-//            } else if (height < 0.95) {
-//                g_color_buffer_data[i][j - 1] = colours.light_grey[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.light_grey[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.light_grey[2] * randNum;
-//
-//            } else if (height <= 1) {
-//                g_color_buffer_data[i][j - 1] = colours.snow_white[0] * randNum;
-//                g_color_buffer_data[i][j] = colours.snow_white[1] * randNum;
-//                g_color_buffer_data[i][j + 1] = colours.snow_white[2] * randNum;
-//            }
-//
-//        }
-//    }
-
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-        glGenBuffers(1, &diamondSquareColourBuffers[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, diamondSquareColourBuffers[i]);
-        glBufferData(GL_ARRAY_BUFFER, g_color_buffer_data[i].size() * sizeof(float), &g_color_buffer_data[i][0],
-                     GL_STATIC_DRAW);
-    }
-}
-
-
-void
-computeDiamondSquareVertexBuffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer, DiamondSquare diamondSquare,
-                                  int noOfVertices) {
-
-    vector<vector<GLfloat>> gl_terrain_verts;
-    gl_terrain_verts.resize(getNoOfTerrainVertexArrays(), vector<GLfloat>(noOfVertices, 0));
-
-    diamondSquare.getVertices(gl_terrain_verts, getNoOfTerrainVertexArrays(), SCALE);
-
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
-        glGenBuffers(1, &vertexBuffers[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers[i]);
-        glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i].size() * sizeof(float), &gl_terrain_verts[i][0],
-                     GL_STATIC_DRAW);
-    }
-
-    computeDiamondSquareColourBuffer(gl_terrain_verts, diamondSquareColourBuffer, noOfVertices);
-
-}
-
-
 int openGLMagic() {
     if (windowSetup() == -1) {
         return -1;
@@ -323,23 +100,14 @@ int openGLMagic() {
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
+    world_maker *world_mkr = new world_maker(9, 0.5);
 
-    /** DIAMOND SQUARE CODE!!! **/
-
-    //our width and depth of our grid
-    int max = (pow(2, TERRAIN_SIZE)) + 1;
-
-    int noOfVertices = ((((max - 1) * (max - 1)) * 2) / getNoOfTerrainVertexArrays()) * 3 * 3;
-
-    //creates a new diamondSquare heightMap
-    DiamondSquare *diamondSquare = new DiamondSquare(max, 10);
 
     /** Bind vertices to buffer**/
-    GLuint diamondSquareVertexBuffers[getNoOfTerrainVertexArrays()];
-    GLuint diamondSquareColourBuffer[getNoOfTerrainVertexArrays()];
+    GLuint diamondSquareVertexBuffers[world_mkr->get_no_of_terrain_vertex_arrays()];
+    GLuint diamondSquareColourBuffer[world_mkr->get_no_of_terrain_vertex_arrays()];
 
-    computeDiamondSquareVertexBuffers(diamondSquareVertexBuffers, diamondSquareColourBuffer, *diamondSquare,
-                                      noOfVertices);
+    world_mkr->makeWorld(diamondSquareVertexBuffers, diamondSquareColourBuffer);
 
     L_System *tree = new L_System("X", 7, 20);
 
@@ -389,7 +157,7 @@ int openGLMagic() {
 // in the "MVP" uniform
 
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-        for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
+        for (int i = 0; i < world_mkr->get_no_of_terrain_vertex_arrays(); i++) {
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, diamondSquareVertexBuffers[i]);
@@ -415,7 +183,7 @@ int openGLMagic() {
             );
 
             // Draw the Terrain !
-//            glDrawArrays(GL_TRIANGLES, 0, noOfVertices);
+            glDrawArrays(GL_TRIANGLES, 0, world_mkr->getDiamondSquare()->get_no_of_vertices());
         }
 
         glEnableVertexAttribArray(0);
@@ -441,7 +209,7 @@ int openGLMagic() {
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
-    for (int i = 0; i < getNoOfTerrainVertexArrays(); i++) {
+    for (int i = 0; i < world_mkr->get_no_of_terrain_vertex_arrays(); i++) {
         glDeleteBuffers(1, &diamondSquareVertexBuffers[i]);
         glDeleteBuffers(1, &diamondSquareColourBuffer[i]);
     }

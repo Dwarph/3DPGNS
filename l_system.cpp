@@ -4,7 +4,10 @@
 
 #include <glm/detail/type_mat.hpp>
 #include <glm/detail/type_mat4x4.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 #include <iostream>
 #include "l_system.h"
 
@@ -59,76 +62,137 @@ void L_System::generateVertices() {
     glm::mat4x4 homogenousCoords;
     homogenousCoords[1];
 
-    glm::fvec4 currentPosition = {0, 0, 0, 0};
+    glm::fvec4 currentPosition = {1, 1, 1, 1};
+    glm::fvec3 angle = {0, 0, 0};
     int levelNum = 1;
     int index = 0;
-    float angle = 0;
+
+    glm::quat rotationQuat = glm::quat(angle);
+
+
 
     std::vector<glm::fvec4> positionBuffer;
-    std::vector<float> angleBuffer;
+    std::vector<glm::fvec3> angleBuffer;
 
-    glm::fmat4 translationMatrix;
 
-    //xAxis rotationVector
-    translationMatrix[3] = {0, 1, 0, 1};
-    translationMatrix[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
-    translationMatrix[1] = {0, glm::cos(angle), glm::sin(angle), 0};
-    translationMatrix[0] = {1, 0, 0, 0};
+    glm::fmat4 translation = glm::translate(glm::mat4(), glm::vec3(10.0f, 0.0f, 0.0f));
+//
+
 
     for (int i = 0; i < this->fractalString.length(); i++) {
         if (this->fractalString[i] == 'F') {
+            // for (int j = 0; j < 2; j++) {
+            rotationQuat = glm::quat(angle);
 
-            translationMatrix[2] = {0, -glm::sin(angle), glm::cos(angle), 0};
-            translationMatrix[1] = {0, glm::cos(angle), glm::sin(angle), 0};
-
-            for (int j = 0; j < 2; j++) {
-                vertices.push_back(currentPosition.x);
-                vertices.push_back(currentPosition.y);
-                vertices.push_back(currentPosition.z);
-                currentPosition.x = currentPosition.x + (glm::cos(angle));
-                currentPosition.y = currentPosition.y + (glm::sin(angle));
                 vertices.push_back(currentPosition.x);
                 vertices.push_back(currentPosition.y);
                 vertices.push_back(currentPosition.z);
 
+//                currentPosition.x = currentPosition.x +
+            currentPosition.y = currentPosition.y + glm::sin(angle.z);
+            currentPosition.z = currentPosition.z + glm::cos(angle.z);
 
+                vertices.push_back(currentPosition.x);
+                vertices.push_back(currentPosition.y);
+                vertices.push_back(currentPosition.z);
 
 //                if (j == 0) {currentPosition =  translation * currentPosition;}
 //                std::cout << angle;
-            }
+            //  }
 
         } else if (this->fractalString[i] == 'f') {
-            currentPosition = currentPosition * translationMatrix;
+            currentPosition = currentPosition;
 
         } else if (this->fractalString[i] == '+') {
-            if (glm::degrees(angle + angleMod) > 360) {
+            //modify angle
+            if (glm::degrees(angle.z + angleMod) > 360) {
                 //prevents precision loss when dealing with large angles
-                angle += this->angleMod - glm::radians(360.0f);
+                angle.z += this->angleMod - glm::radians(360.0f);
             } else {
-                angle += this->angleMod;
+                angle.z += this->angleMod;
             }
 
-//            std::cout << "Angle+: " << glm::degrees(angle) << std::endl;
+
+            //recalculate z matrix
 
         } else if (this->fractalString[i] == '-') {
-            if (glm::degrees(angle - angleMod) < 0) {
+            //work out angle
+            if (glm::degrees(angle.z - angleMod) < 0) {
                 //prevents precision loss when dealing with large angles
-                angle = (angle - this->angleMod) + glm::radians(360.0f);
+                angle.z = (angle.z - this->angleMod) + glm::radians(360.0f);
             } else {
-                angle -= this->angleMod;
+                angle.z -= this->angleMod;
             }
 
-//            std::cout << "Angle-: " << glm::degrees(angle) << std::endl;
+
+            //recalculate z matrix
+
 
         } else if (this->fractalString[i] == '&') {
+            //modify angle
+            if (glm::degrees(angle.y + angleMod) > 360) {
+                //prevents precision loss when dealing with large angles
+                angle.y += this->angleMod - glm::radians(360.0f);
+            } else {
+                angle.y += this->angleMod;
+            }
 
-        } else if (this->fractalString[i] == '\\') {
+
+            //recalculate y matrix
+
 
         } else if (this->fractalString[i] == '^') {
 
+            //work out angle
+            if (glm::degrees(angle.y - angleMod) < 0) {
+                //prevents precision loss when dealing with large angles
+                angle.y = (angle.y - this->angleMod) + glm::radians(360.0f);
+            } else {
+                angle.y -= this->angleMod;
+            }
+
+            //recalculate y matrix
+
+
+        } else if (this->fractalString[i] == '\\') {
+
+            //modify anglefa
+            if (glm::degrees(angle.x + angleMod) > 360) {
+                //prevents precision loss when dealing with large angles
+                angle.x += this->angleMod - glm::radians(360.0f);
+            } else {
+                angle.x += this->angleMod;
+            }
+
+
+            //recalculate x matrix
+
+
         } else if (this->fractalString[i] == '/') {
 
+
+            //work out angle
+            if (glm::degrees(angle.y - angleMod) < 0) {
+                //prevents precision loss when dealing with large angles
+                angle.x = (angle.x - this->angleMod) + glm::radians(360.0f);
+            } else {
+                angle.x -= this->angleMod;
+            }
+
+            //recalculate x matrix
+
+
         } else if (this->fractalString[i] == '|') {
+
+            if (glm::degrees(angle.z) + 180 > 360) {
+                //prevents precision loss when dealing with large angles
+                angle.z -= glm::radians(180.0f);
+            } else {
+                angle.z += glm::radians(180.0f);
+            }
+
+            //recalculate z matrix
+
 
         } else if (this->fractalString[i] == '[') {
             positionBuffer.push_back(currentPosition);
