@@ -85,7 +85,7 @@ world_maker::compute_diamond_square_colour_buffer(vector<vector<GLfloat>> gl_ter
     float height, rand_num;
 
 //    vertex_colour_rainbow(g_color_buffer_data);
-//    vertex_colour_greyscale(g_color_buffer_data, min_height, height_range);
+//    vertex_colour_greyscale(g_color_buffer_data, gl_terrain_verts, min_height, height_range);
     vertex_colour_real(g_color_buffer_data, gl_terrain_verts, colours, min_height, max_height);
 //    vertex_colour_real_blended(g_color_buffer_data, gl_terrain_verts, colours, min_height, max_height);
 
@@ -108,14 +108,15 @@ void world_maker::vertex_colour_rainbow(vector<vector<GLfloat>> &g_color_buffer_
     }
 }
 
-void world_maker::vertex_colour_greyscale(vector<vector<GLfloat>> &g_color_buffer_data, float min_height,
+void world_maker::vertex_colour_greyscale(vector<vector<GLfloat>> &g_color_buffer_data,
+                                          vector<vector<GLfloat>> gl_terrain_verts, float min_height,
                                           float height_range) {
 
     for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamondSquare->get_no_of_vertices(); j += 3) {
-            g_color_buffer_data[i][j - 1] = (g_color_buffer_data[i][j] - min_height) / height_range;
-            g_color_buffer_data[i][j] = (g_color_buffer_data[i][j] - min_height) / height_range;
-            g_color_buffer_data[i][j + 1] = (g_color_buffer_data[i][j] - min_height) / height_range;
+            g_color_buffer_data[i][j - 1] = (gl_terrain_verts[i][j] - min_height) / height_range;
+            g_color_buffer_data[i][j] = (gl_terrain_verts[i][j] - min_height) / height_range;
+            g_color_buffer_data[i][j + 1] = (gl_terrain_verts[i][j] - min_height) / height_range;
         }
     }
 }
@@ -129,7 +130,7 @@ world_maker::vertex_colour_real(vector<vector<GLfloat>> &g_color_buffer_data, ve
         for (int j = 1; j < diamondSquare->get_no_of_vertices(); j += 3) {
             int min = 97, max = 103;
 
-            height = (gl_terrain_verts[i][j] - min_height) / max_height - min_height;
+            height = (gl_terrain_verts[i][j] - min_height) / (max_height - min_height);
             rand_num = (float) (rand() % (max + 1 - min) + min);
             rand_num /= 100;
 
@@ -183,7 +184,7 @@ void world_maker::vertex_colour_real_blended(vector<vector<GLfloat>> &g_color_bu
         for (int j = 1; j < diamondSquare->get_no_of_vertices(); j += 3) {
             int min = 97, max = 103;
 
-            height = (gl_terrain_verts[i][j] - min_height) / max_height - min_height;
+            height = (gl_terrain_verts[i][j] - min_height) / (max_height - min_height);
             rand_num = (float) (rand() % (max + 1 - min) + min);
             rand_num /= 100;
 

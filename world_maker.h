@@ -49,7 +49,8 @@ private:
 
     void vertex_colour_rainbow(vector<vector<GLfloat>> &g_color_buffer_data);
 
-    void vertex_colour_greyscale(vector<vector<GLfloat>> &g_color_buffer_data, float min_height, float height_range);
+    void vertex_colour_greyscale(vector<vector<GLfloat>> &g_color_buffer_data, vector<vector<GLfloat>> gl_terrain_verts,
+                                 float min_height, float height_range);
 
     void vertex_colour_real(vector<vector<GLfloat>> &g_color_buffer_data,
                             vector<vector<GLfloat>> gl_terrain_verts,
