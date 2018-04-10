@@ -1,31 +1,27 @@
 #include <iostream>
-
-#include "./l_system.h"
-#include "world_maker.h"
-
-// Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
-
-// Include GLEW
 #include <GL/glew.h>
-
-// Include GLFW
 #include <glfw3.h>
-
-GLFWwindow *window;
-
-// Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "external/OpenGLTutorialUsefulFiles/controls.hpp"
 #include <external/OpenGLTutorialUsefulFiles/shader.hpp>
+
+#include "world_maker.h"
+#include "external/OpenGLTutorialUsefulFiles/controls.hpp"
+
 
 using namespace glm;
 using namespace std;
 
+GLFWwindow *window;
 
-int windowSetup() {
+/**
+ * Sets up the GLFW window
+ * Code initially taken from http://opengl-tutorial.org
+ * @return
+ */
+int WindowSetup() {
     // Initialise GLFW
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
@@ -49,6 +45,7 @@ int windowSetup() {
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
 
     // Initialize GLEW
@@ -66,7 +63,6 @@ int windowSetup() {
     //hide the mouse and let use move infinitely
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
     //blue background
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -75,7 +71,6 @@ int windowSetup() {
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 
-
     glDepthMask(GL_TRUE);
 
     // Cull triangles which normal is not towards the camera
@@ -83,8 +78,12 @@ int windowSetup() {
 //    glCullFace(GL_FRONT);
 }
 
-int openGLMagic() {
-    if (windowSetup() == -1) {
+/**
+ * Gets the vertices needed to pass to OpenGL & displays them in a draw loop.
+ * @return
+ */
+int OpenGLMagic() {
+    if (WindowSetup() == -1) {
         return -1;
     };
 
@@ -94,46 +93,21 @@ int openGLMagic() {
     glBindVertexArray(VertexArrayID);
 
     // Create and compile our GLSL program from the shaders
-    GLuint programID = LoadShaders("external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader",
-                                   "external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader");
+    GLuint terrain_shaders = LoadShaders("external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader",
+                                         "external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader");
 
     // Get a handle for our "MVP" uniform
-    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    GLuint MatrixID = glGetUniformLocation(terrain_shaders, "MVP");
 
-    world_maker *world_mkr = new world_maker(9, 0.5);
+    WorldMaker *world_maker = new WorldMaker(9, 1);
 
 
     /** Bind vertices to buffer**/
-    GLuint diamondSquareVertexBuffers[world_mkr->get_no_of_terrain_vertex_arrays()];
-    GLuint diamondSquareColourBuffer[world_mkr->get_no_of_terrain_vertex_arrays()];
-
-    world_mkr->makeWorld(diamondSquareVertexBuffers, diamondSquareColourBuffer);
-
-    L_System *tree = new L_System("X", 7, 20);
-
-    Rule rule;
-    rule.axiom = 'X';
-    rule.rule = "F[+X]F[-X]+X";
-
-    tree->addRule(rule);
-
-    rule.axiom = 'F';
-    rule.rule = "FF";
-
-    tree->addRule(rule);
-
-
-    tree->generateFractal();
-    tree->generateVertices();
-
-
+    GLuint diamondSquareVertexBuffers[world_maker->get_no_of_terrain_vertex_arrays()];
+    GLuint diamondSquareColourBuffer[world_maker->get_no_of_terrain_vertex_arrays()];
     GLuint treeVertexBuffer;
-    glGenBuffers(1, &treeVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, treeVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, tree->getVertices().size() * sizeof(float), &tree->getVertices()[0],
-                 GL_STATIC_DRAW);
 
-
+    world_maker->makeWorld(diamondSquareVertexBuffers, diamondSquareColourBuffer, &treeVertexBuffer);
 
     /** Main Draw Loop **/
     do {
@@ -141,8 +115,10 @@ int openGLMagic() {
 // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glShadeModel(GL_FLAT);
+
 // Use our shader
-        glUseProgram(programID);
+        glUseProgram(terrain_shaders);
 
 // Compute the MVP matrix from keyboard and mouse input
         computeMatricesFromInputs();
@@ -157,7 +133,7 @@ int openGLMagic() {
 // in the "MVP" uniform
 
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-        for (int i = 0; i < world_mkr->get_no_of_terrain_vertex_arrays(); i++) {
+        for (int i = 0; i < world_maker->get_no_of_terrain_vertex_arrays(); i++) {
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, diamondSquareVertexBuffers[i]);
@@ -183,7 +159,7 @@ int openGLMagic() {
             );
 
             // Draw the Terrain !
-            glDrawArrays(GL_TRIANGLES, 0, world_mkr->getDiamondSquare()->get_no_of_vertices());
+            glDrawArrays(GL_TRIANGLES, 0, world_maker->getDiamondSquare()->get_no_of_vertices());
         }
 
         glEnableVertexAttribArray(0);
@@ -196,7 +172,7 @@ int openGLMagic() {
                 0,                  // stride
                 (void *) 0            // array buffer offset
         );
-        glDrawArrays(GL_LINES, 0, tree->getVertices().size() / 3);
+        glDrawArrays(GL_LINES, 0, world_maker->getTree()->get_vertices().size() / 3);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -209,12 +185,12 @@ int openGLMagic() {
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
-    for (int i = 0; i < world_mkr->get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < world_maker->get_no_of_terrain_vertex_arrays(); i++) {
         glDeleteBuffers(1, &diamondSquareVertexBuffers[i]);
         glDeleteBuffers(1, &diamondSquareColourBuffer[i]);
     }
 
-    glDeleteProgram(programID);
+    glDeleteProgram(terrain_shaders);
     glDeleteVertexArrays(1, &VertexArrayID);
 
 // Close OpenGL window and terminate GLFW
@@ -224,6 +200,6 @@ int openGLMagic() {
 }
 
 int main() {
-    return openGLMagic();
+    return OpenGLMagic();
 }
 

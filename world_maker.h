@@ -9,6 +9,8 @@
 #include <GL/glew.h>
 
 #include "./diamond_square.h"
+#include "./l_system.h"
+
 
 struct colour_list {
     GLfloat ivy_green[3] = {0.38, 0.47, 0.28};
@@ -20,13 +22,13 @@ struct colour_list {
     GLfloat med_grey[3] = {0.72, 0.68, 0.6};
 };
 
-class world_maker {
+class WorldMaker {
 
 public:
 
-    world_maker(int terrain_size, float scale);
+    WorldMaker(int terrain_size, float scale);
 
-    void makeWorld(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer);
+    void makeWorld(GLuint *terrainVertexBuffers, GLuint *diamondSquareColourBuffer, GLuint *treeVertexBuffer);
 
     int get_no_of_terrain_vertex_arrays();
 
@@ -36,16 +38,21 @@ public:
 
     DiamondSquare *getDiamondSquare() const;
 
+    LSystem *getTree() const;
+
 private:
     int terrain_size;
     float scale;
     DiamondSquare *diamondSquare;
+    LSystem *tree;
 
     void
     compute_diamond_square_vertex_buffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer);
 
     void compute_diamond_square_colour_buffer(vector<vector<GLfloat>> gl_terrain_verts,
                                               GLuint *diamondSquareColourBuffers);
+
+    void compute_l_system_vertex_buffer(GLuint *vertexBuffer);
 
     void vertex_colour_rainbow(vector<vector<GLfloat>> &g_color_buffer_data);
 

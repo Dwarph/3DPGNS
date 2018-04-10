@@ -16,33 +16,33 @@ struct Rule {
     std::string rule;
 };
 
-class L_System {
+class LSystem {
 
 public:
 
-    L_System(const std::string &seed, int no_of_iterations, float angleMod);
+    LSystem(const std::string &seed, int no_of_iterations, float angleMod, float scale);
 
-    void generateFractal();
+    void GenerateFractal();
 
-    void addRule(Rule rule);
+    void AddRule(Rule rule);
 
-    void generateVertices();
+    void GenerateVertices();
 
-    void setSeed(const std::string &seed);
+    void set_seed(const std::string &seed);
 
-    const std::vector<GLfloat> &getVertices() const;
+    const std::vector<GLfloat> &get_vertices() const;
 
 
 private:
 
-    std::string seed;
-    std::string fractalString;
-    int no_of_iterations;
-    std::vector<Rule> rules;
-    std::vector<GLfloat> vertices;
-    float angleMod;
+    std::string seed_;
+    std::string fractal_string_;
+    int no_of_iterations_;
+    std::vector<Rule> rules_;
+    std::vector<GLfloat> vertices_;
+    float angle_mod_;
+    float scale_;
 
-    float getLineLength(int length);
 };
 
 

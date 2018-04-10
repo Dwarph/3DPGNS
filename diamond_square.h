@@ -8,29 +8,31 @@
 #include <vector>
 #include <GL/glew.h>
 #include <string>
-
-#include <stdlib.h>     /* srand, rand */
+#include <stdlib.h>
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
 
-
+/**
+ * Header file for DiamondSquare.cpp
+ * Functions functionality detailed in the .cpp file
+ */
 class DiamondSquare {
 
 public:
 
     DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays);
 
-    vector<vector<float>> getHeightMap();
+    vector<vector<float>> get_height_map();
 
-    void divide();
+    void GenerateHeightMap();
 
-    void getVertices(vector<vector<GLfloat>> &gl_terrain_verts, float scale);
+    void GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, float scale);
 
-    float get_height(int x, int z);
+    float GetHeight(int x, int z);
 
-    int rand_in_range(int range);
+    int RandInRange(int range);
 
     int get_max_size() const;
 
@@ -39,25 +41,25 @@ public:
 
 private :
 
-    int max_size;
-    int no_of_vertices;
-    float roughness;
-    vector<vector<float> > height_map;
-    int no_of_terrain_vertex_arrays;
+    int max_size_;
+    int no_of_vertices_;
+    float roughness_;
+    vector<vector<float> > height_map_;
+    int no_of_terrain_vertex_arrays_;
 
-    float getValue(int x, int z);
+    float GetWrappedHeight(int x, int z);
 
-    void diamond_step(int x, int z, int step, float offset);
+    void DiamondStep(int x, int z, int step, float offset);
 
-    void square_step(int x, int z, int step, float offset);
+    void SquareStep(int x, int z, int step, float offset);
 
-    void resize_vec(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
+    void ResizeVector(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
-    int set_vert_at_point(vector<GLfloat> &verts, int index, int x, int z, float scale);
+    void set_vert_at_point(vector<GLfloat> &verts, int *index, int x, int z, float scale);
 
-    void print_grid(string initial);
+    void PrintGrid(string initial, bool show_zero);
 
-    float average_corners(float *values);
+    float AverageValues(float *values);
 
 };
 

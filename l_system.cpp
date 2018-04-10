@@ -11,178 +11,210 @@
 #include <iostream>
 #include "l_system.h"
 
-L_System::L_System(const std::string &seed, int no_of_iterations, float angleMod) {
-    this->seed = seed;
-    this->no_of_iterations = no_of_iterations;
-    this->fractalString = this->seed;
-    this->angleMod = glm::radians(angleMod);
+/**
+ * This Class holds details of an L_System, its rules, seed and eventual string
+ */
+
+/* Constructor */
+
+/**
+ * Constructor for L_System
+ * @param seed
+ * @param no_of_iterations
+ * @param angleMod
+ * @param scale
+ */
+LSystem::LSystem(const std::string &seed, int no_of_iterations, float angleMod, float scale) {
+    this->seed_ = seed;
+    this->no_of_iterations_ = no_of_iterations;
+    this->fractal_string_ = this->seed_;
+    this->angle_mod_ = glm::radians(angleMod);
+    this->scale_ = scale;
 }
 
+/* Getters and Setters */
 
-void L_System::addRule(Rule rule) {
-    rules.push_back(rule);
+/**
+ * Returns the vertices
+ * @return vector<GLfloat> L_System
+ */
+const std::vector<GLfloat> &LSystem::get_vertices() const {
+    return vertices_;
 }
 
-void L_System::generateFractal() {
-    //could replace "rules" with a hashmap
+/**
+ * Sets the seed
+ * @param seed
+ */
+void LSystem::set_seed(const std::string &seed) {
+    this->seed_ = seed;
+}
+
+/**
+ * Adds a rule to the set of rules for the L_System
+ * @param rule
+ */
+void LSystem::AddRule(Rule rule) {
+    rules_.push_back(rule);
+}
+
+/* Main Functions */
+
+/**
+ * Generates the fractal by looping through the string for n iterations,
+ * building up the string each iteration according to the list of rules
+ */
+void LSystem::GenerateFractal() {
+
+    //could replace "rules_" with a hashmap
 
     std::string newString = "";
-    this->fractalString = this->seed;
+    this->fractal_string_ = this->seed_;
     bool found = false;
-    int size = 0;
 
-    for (int n = 0; n < this->no_of_iterations; n++) {
-
-        if (n == 4) {
-            rand();
-        }
-
-        for (int i = 0; i < this->fractalString.length(); i++) {
-            for (int j = 0; j < this->rules.size(); j++) {
-                if (this->fractalString[i] == this->rules[j].axiom) {
-                    newString.append(this->rules[j].rule);
+    for (int n = 0; n < this->no_of_iterations_; n++) {
+        for (int i = 0; i < this->fractal_string_.length(); i++) {
+            for (int j = 0; j < this->rules_.size(); j++) {
+                if (this->fractal_string_[i] == this->rules_[j].axiom) {
+                    newString.append(this->rules_[j].rule);
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                newString += this->fractalString[i];
+                newString += this->fractal_string_[i];
             }
             found = false;
-
         }
-        fractalString = newString;
+        fractal_string_ = newString;
         newString = "";
     }
 }
 
+/**
+ * Generates Vertices based on the string generated in generate_fractal
+ */
+void LSystem::GenerateVertices() {
 
-void L_System::generateVertices() {
+    glm::mat4x4 homogenous_coords;
+    homogenous_coords[1];
 
-    glm::mat4x4 homogenousCoords;
-    homogenousCoords[1];
-
-    glm::fvec4 currentPosition = {1, 1, 1, 1};
+    glm::fvec4 current_position = {1, 1, 1, 1};
     glm::fvec3 angle = {0, 0, 0};
+    glm::fvec3 x_axis = {0, 1, 1};
+    glm::fvec3 y_axis = {1, 0, 1};
+    glm::fvec3 z_axis = {1, 1, 0};
     int levelNum = 1;
-    int index = 0;
-
-    glm::quat rotationQuat = glm::quat(angle);
-
-
 
     std::vector<glm::fvec4> positionBuffer;
     std::vector<glm::fvec3> angleBuffer;
 
+    glm::fmat4 rotation_matrix_z = glm::rotate(angle.z, z_axis);
 
-    glm::fmat4 translation = glm::translate(glm::mat4(), glm::vec3(10.0f, 0.0f, 0.0f));
+    glm::fmat4 translation = glm::translate(glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
+
+    for (int i = 0; i < this->fractal_string_.length(); i++) {
+
+        //Draw a line and move forward by 1, following the orientation "angle"
+        if (this->fractal_string_[i] == 'F') {
+
+            glm::fvec4 old_position = current_position;
+
+            vertices_.push_back(current_position.x * this->scale_);
+            vertices_.push_back(current_position.y * this->scale_);
+            vertices_.push_back(current_position.z * this->scale_);
+
+            //correct way to rotate (can be applied in 3D Space)
+//            z_axis.x = current_position.x;
+//            z_axis.y = current_position.y;
 //
+//            glm::fmat4 rotationMatrixZ = glm::rotate(angle.z, z_axis);
+//
+//            //            std::cout << "angleZ: " << glm::degrees(angle.z) << std::endl;
+//
+//            current_position = translation * rotationMatrixZ * current_position;
 
 
-    for (int i = 0; i < this->fractalString.length(); i++) {
-        if (this->fractalString[i] == 'F') {
-            // for (int j = 0; j < 2; j++) {
-            rotationQuat = glm::quat(angle);
+            // rotation only able to be applied in 2D space - but it works in 2D!
+            current_position.x = current_position.x + (glm::cos(angle.z + glm::radians(90.0f)));
+            current_position.y = current_position.y + (glm::sin(angle.z + glm::radians(90.0f)));
 
-                vertices.push_back(currentPosition.x);
-                vertices.push_back(currentPosition.y);
-                vertices.push_back(currentPosition.z);
+            vertices_.push_back(current_position.x * this->scale_);
+            vertices_.push_back(current_position.y * this->scale_);
+            vertices_.push_back(current_position.z * this->scale_);
 
-//                currentPosition.x = currentPosition.x +
-            currentPosition.y = currentPosition.y + glm::sin(angle.z);
-            currentPosition.z = currentPosition.z + glm::cos(angle.z);
+            //Move forward by 1 without drawing a line, following the orientation "angle"
+        } else if (this->fractal_string_[i] == 'f') {
+            current_position = current_position;
 
-                vertices.push_back(currentPosition.x);
-                vertices.push_back(currentPosition.y);
-                vertices.push_back(currentPosition.z);
+            //Turn left by angle_mod
+        } else if (this->fractal_string_[i] == '+') {
 
-//                if (j == 0) {currentPosition =  translation * currentPosition;}
-//                std::cout << angle;
-            //  }
-
-        } else if (this->fractalString[i] == 'f') {
-            currentPosition = currentPosition;
-
-        } else if (this->fractalString[i] == '+') {
             //modify angle
-            if (glm::degrees(angle.z + angleMod) > 360) {
+            if (glm::degrees(angle.z + angle_mod_) > 360) {
                 //prevents precision loss when dealing with large angles
-                angle.z += this->angleMod - glm::radians(360.0f);
+                angle.z = this->angle_mod_ - glm::radians(360.0f);
             } else {
-                angle.z += this->angleMod;
+                angle.z += this->angle_mod_;
             }
 
+            //Turn right by angle_mod
+        } else if (this->fractal_string_[i] == '-') {
 
-            //recalculate z matrix
-
-        } else if (this->fractalString[i] == '-') {
             //work out angle
-            if (glm::degrees(angle.z - angleMod) < 0) {
+            if (glm::degrees(angle.z - angle_mod_) < 0) {
                 //prevents precision loss when dealing with large angles
-                angle.z = (angle.z - this->angleMod) + glm::radians(360.0f);
+                angle.z = (angle.z - this->angle_mod_) + glm::radians(360.0f);
             } else {
-                angle.z -= this->angleMod;
+                angle.z -= this->angle_mod_;
             }
 
+            //Pitch down by angle_mod
+        } else if (this->fractal_string_[i] == '&') {
 
-            //recalculate z matrix
-
-
-        } else if (this->fractalString[i] == '&') {
             //modify angle
-            if (glm::degrees(angle.y + angleMod) > 360) {
+            if (glm::degrees(angle.y + angle_mod_) > 360) {
                 //prevents precision loss when dealing with large angles
-                angle.y += this->angleMod - glm::radians(360.0f);
+                angle.y = this->angle_mod_ - glm::radians(360.0f);
             } else {
-                angle.y += this->angleMod;
+                angle.y += this->angle_mod_;
             }
 
-
-            //recalculate y matrix
-
-
-        } else if (this->fractalString[i] == '^') {
+            //Pitch up by angle_mod
+        } else if (this->fractal_string_[i] == '^') {
 
             //work out angle
-            if (glm::degrees(angle.y - angleMod) < 0) {
+            if (glm::degrees(angle.y - angle_mod_) < 0) {
                 //prevents precision loss when dealing with large angles
-                angle.y = (angle.y - this->angleMod) + glm::radians(360.0f);
+                angle.y = (angle.y - this->angle_mod_) + glm::radians(360.0f);
             } else {
-                angle.y -= this->angleMod;
+                angle.y -= this->angle_mod_;
             }
 
-            //recalculate y matrix
-
-
-        } else if (this->fractalString[i] == '\\') {
-
-            //modify anglefa
-            if (glm::degrees(angle.x + angleMod) > 360) {
-                //prevents precision loss when dealing with large angles
-                angle.x += this->angleMod - glm::radians(360.0f);
-            } else {
-                angle.x += this->angleMod;
-            }
-
-
-            //recalculate x matrix
-
-
-        } else if (this->fractalString[i] == '/') {
-
+            //Roll left by angle_mod
+        } else if (this->fractal_string_[i] == '\\') {
 
             //work out angle
-            if (glm::degrees(angle.y - angleMod) < 0) {
+            if (glm::degrees(angle.x + angle_mod_) > 360) {
                 //prevents precision loss when dealing with large angles
-                angle.x = (angle.x - this->angleMod) + glm::radians(360.0f);
+                angle.x = this->angle_mod_ - glm::radians(360.0f);
             } else {
-                angle.x -= this->angleMod;
+                angle.x += this->angle_mod_;
             }
 
-            //recalculate x matrix
+            //Roll right by angle_mod
+        } else if (this->fractal_string_[i] == '/') {
 
+            //work out angle
+            if (glm::degrees(angle.y - angle_mod_) < 0) {
+                //prevents precision loss when dealing with large angles
+                angle.x = (angle.x - this->angle_mod_) + glm::radians(360.0f);
+            } else {
+                angle.x -= this->angle_mod_;
+            }
 
-        } else if (this->fractalString[i] == '|') {
+            //Turn around by 180 degrees
+        } else if (this->fractal_string_[i] == '|') {
 
             if (glm::degrees(angle.z) + 180 > 360) {
                 //prevents precision loss when dealing with large angles
@@ -191,30 +223,37 @@ void L_System::generateVertices() {
                 angle.z += glm::radians(180.0f);
             }
 
-            //recalculate z matrix
-
-
-        } else if (this->fractalString[i] == '[') {
-            positionBuffer.push_back(currentPosition);
+            //Push the current state of the turtle onto a stack
+        } else if (this->fractal_string_[i] == '[') {
+            positionBuffer.push_back(current_position);
             angleBuffer.push_back(angle);
             levelNum++;
-        } else if (this->fractalString[i] == ']') {
-            currentPosition = positionBuffer.back();
+
+            //Pop the state of the turtle off the stack
+        } else if (this->fractal_string_[i] == ']') {
+            current_position = positionBuffer.back();
             angle = angleBuffer.back();
             positionBuffer.pop_back();
             angleBuffer.pop_back();
             levelNum--;
         }
     }
+
+    z_axis = {1, 1, 0};
+    for (int i = 0; i < vertices_.size(); i += 3) {
+
+        float vertex[] = {vertices_[i], vertices_[i + 1], vertices_[i + 2]};
+        vertex[2] = vertex[0] + (glm::cos(90.0f));
+        vertex[1] = vertex[1] + (glm::sin(90.0f));
+
+        vertices_[i] = vertex[0];
+        vertices_[i + 1] = vertex[1];
+        vertices_[i + 2] = vertex[2];
+
+    }
 }
 
-void L_System::setSeed(const std::string &seed) {
-    L_System::seed = seed;
-}
 
-const std::vector<GLfloat> &L_System::getVertices() const {
-    return vertices;
-}
 
 
 
