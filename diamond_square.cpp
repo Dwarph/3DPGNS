@@ -38,11 +38,13 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
     //sets the seed_ of the random number generator algorithm used by the function rand using the internal clock.
     srand(time(NULL));
 
-    //calculates the roughness_ of the terrain. Currently random each time.
-    this->roughness_ = (((float) (rand() % (rough_max) + 1)) * 0.01) + 0.05;
+    //calculates the roughness_ of the terrain randomly
+//    this->roughness_ = (((float) (rand() % (rough_max) + 1)) * 0.01) + 0.05;
+
+    this->roughness_ = 0.15;
+
 
     cout << "ROUGH: " << this->roughness_ << endl;
-
 
     //seeds the initial values of the heightmap to 0
     for (int i = 0; i < max; i++) {

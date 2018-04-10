@@ -38,7 +38,6 @@ public:
 
     int get_no_of_vertices();
 
-
 private :
 
     int max_size_;

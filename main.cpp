@@ -96,8 +96,14 @@ int OpenGLMagic() {
     GLuint terrain_shaders = LoadShaders("external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader",
                                          "external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader");
 
-    // Get a handle for our "MVP" uniform
-    GLuint MatrixID = glGetUniformLocation(terrain_shaders, "MVP");
+    GLuint l_system_shaders = LoadShaders("Shaders/l_system_transform.vert.glsl",
+                                          "Shaders/l_system_colour.frag.glsl");
+
+    // Get a handle for our terrain_shaders uniform
+    GLuint terrain_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
+
+    // Get a handle for our l_system shaders uniform
+    GLuint l_system_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
 
     WorldMaker *world_maker = new WorldMaker(9, 1);
 
@@ -107,7 +113,7 @@ int OpenGLMagic() {
     GLuint diamondSquareColourBuffer[world_maker->get_no_of_terrain_vertex_arrays()];
     GLuint treeVertexBuffer;
 
-    world_maker->makeWorld(diamondSquareVertexBuffers, diamondSquareColourBuffer, &treeVertexBuffer);
+    world_maker->MakeWorld(diamondSquareVertexBuffers, diamondSquareColourBuffer, &treeVertexBuffer);
 
     /** Main Draw Loop **/
     do {
@@ -132,7 +138,7 @@ int OpenGLMagic() {
 // Send our transformation to the currently bound shader,
 // in the "MVP" uniform
 
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+        glUniformMatrix4fv(terrain_shaders_uniform_id, 1, GL_FALSE, &MVP[0][0]);
         for (int i = 0; i < world_maker->get_no_of_terrain_vertex_arrays(); i++) {
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
@@ -159,7 +165,7 @@ int OpenGLMagic() {
             );
 
             // Draw the Terrain !
-            glDrawArrays(GL_TRIANGLES, 0, world_maker->getDiamondSquare()->get_no_of_vertices());
+            glDrawArrays(GL_TRIANGLES, 0, world_maker->get_diamond_square()->get_no_of_vertices());
         }
 
         glEnableVertexAttribArray(0);
@@ -172,7 +178,7 @@ int OpenGLMagic() {
                 0,                  // stride
                 (void *) 0            // array buffer offset
         );
-        glDrawArrays(GL_LINES, 0, world_maker->getTree()->get_vertices().size() / 3);
+        glDrawArrays(GL_LINES, 0, world_maker->get_tree()->get_vertices().size() / 3);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
