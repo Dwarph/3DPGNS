@@ -30,29 +30,36 @@ public:
 
     void GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, float scale);
 
-    float GetHeight(int x, int z);
+    float get_height(int x, int z);
 
-    int RandInRange(int range);
+    int RandInRange(int range, bool negative);
 
     int get_max_size() const;
 
     int get_no_of_vertices();
+
+    float get_max_height() const;
+
+    float get_min_height() const;
+
+    void ResizeVector(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
 private :
 
     int max_size_;
     int no_of_vertices_;
     float roughness_;
-    vector<vector<float> > height_map_;
+    vector<vector<float>> height_map_;
     int no_of_terrain_vertex_arrays_;
+    float max_height_;
+    float min_height_;
 
-    float GetWrappedHeight(int x, int z);
+    float get_wrapped_height(int x, int z);
 
     void DiamondStep(int x, int z, int step, float offset);
 
     void SquareStep(int x, int z, int step, float offset);
 
-    void ResizeVector(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
     void set_vert_at_point(vector<GLfloat> &verts, int *index, int x, int z, float scale);
 

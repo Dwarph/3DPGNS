@@ -28,57 +28,60 @@ public:
 
     WorldMaker(int terrain_size, float scale);
 
-    void MakeWorld(GLuint *terrainVertexBuffers, GLuint *diamondSquareColourBuffer, GLuint *treeVertexBuffer);
+    void MakeWorld(GLuint *terrain_vertex_buffers,
+                   GLuint *diamond_square_colour_buffers,
+                   GLuint *tree_vertex_buffer,
+                   GLuint *tree_position_vertex_buffer);
 
     int get_no_of_terrain_vertex_arrays();
 
     int get_terrain_size() const;
 
-    float get_scale() const;
+    float get_terrain_scale() const;
+
+    vector<int> get_num_trees_() const;
 
     DiamondSquare *get_diamond_square() const;
 
-    LSystem *get_tree() const;
+    std::vector<LSystem> get_tree() const;
 
-    const vector<GLfloat> &get_tree_positions_() const;
+    const vector<vector<GLfloat>> &get_tree_positions_() const;
+
+    const int get_num_l_systems() const;
 
 private:
     int terrain_size_;
-    float scale_;
+    float terrain_scale_;
     DiamondSquare *diamond_square_;
-    LSystem *tree_;
-    std::vector<GLfloat> tree_positions_;
-
+    std::vector<LSystem> trees_;
+    std::vector<int> num_trees_;
+    std::vector<vector<GLfloat>> tree_positions_;
 
 
     void
-    ComputeDiamondSquareBuffers(GLuint *vertexBuffers, GLuint *diamondSquareColourBuffer);
+    ComputeDiamondSquareBuffers(GLuint *vertex_buffers, GLuint *diamond_square_colour_buffers);
 
     void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> gl_terrain_verts,
-                                           GLuint *diamondSquareColourBuffers);
+                                           GLuint *diamond_square_colour_buffers);
 
-    void ComputeLSystemVertexBuffer(GLuint *vertexBuffer);
+    void ComputeLSystemVertexBuffer(GLuint *vertex_buffer);
 
     void VertexColourRainbow(vector<vector<GLfloat>> &g_color_buffer_data);
 
     void VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_data, vector<vector<GLfloat>> gl_terrain_verts,
-                               float min_height, float height_range);
+                               float min_height);
 
     void VertexColourReal(vector<vector<GLfloat>> &g_color_buffer_data,
                           vector<vector<GLfloat>> gl_terrain_verts,
-                          ColourList colours,
-                          float min_height, float max_height);
+                          ColourList colours);
 
     void VertexColourRealBlended(vector<vector<GLfloat>> &g_color_buffer_data,
                                  vector<vector<GLfloat>> gl_terrain_verts,
-                                 ColourList colours,
-                                 float min_height, float max_height);
+                                 ColourList colours);
 
     GLfloat *BlendColours(GLfloat *colour_one, GLfloat *colour_two, GLfloat *blended_colour, float percent);
 
-    void GenerateTreePositionBuffer(int no_of_trees);
-
+    void GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer);
 };
-
 
 #endif //INC_3DPGNS_WORLD_MAKER_H

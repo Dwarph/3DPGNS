@@ -22,6 +22,9 @@
 
 DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays) {
 
+    this->max_height_ = 0;
+    this->min_height_ = 0;
+
     // sets our width & depth size
     this->max_size_ = max;
 
@@ -54,10 +57,10 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
     }
 
     //sets the four corners of the heightmap to a random height between 0 & 1
-    this->height_map_.at(0).at(0) = (max * RandInRange(10) % 10);
-    this->height_map_.at(max - 1).at(0) = (max * RandInRange(10) % 10);
-    this->height_map_.at(max - 1).at(max - 1) = (max * RandInRange(10) % 10);
-    this->height_map_.at(0).at(max - 1) = (max * RandInRange(10) % 10);
+    this->height_map_.at(0).at(0) = (max * RandInRange(10, true) % 10);
+    this->height_map_.at(max - 1).at(0) = (max * RandInRange(10, true) % 10);
+    this->height_map_.at(max - 1).at(max - 1) = (max * RandInRange(10, true) % 10);
+    this->height_map_.at(0).at(max - 1) = (max * RandInRange(10, true) % 10);
 
     //generates the height map
     this->GenerateHeightMap();
@@ -80,7 +83,7 @@ int DiamondSquare::get_max_size() const {
  * @param z
  * @return
  */
-float DiamondSquare::GetHeight(int x, int z) {
+float DiamondSquare::get_height(int x, int z) {
     //gets the heights at the appropriate index
     return height_map_.at(x).at(z);
 }
@@ -93,7 +96,7 @@ float DiamondSquare::GetHeight(int x, int z) {
  * @param z
  * @return
  */
-float DiamondSquare::GetWrappedHeight(int x, int z) {
+float DiamondSquare::get_wrapped_height(int x, int z) {
 
     //this allows for all values to be based off of 4 values, by wrapping the squares and diamonds.
     if (x < 0) {
@@ -138,7 +141,7 @@ vector<vector<float>> DiamondSquare::get_height_map() {
 void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int x, int z, float scale) {
     vertices[*index] = x * scale;
     (*index)++;
-    vertices[*index] = this->GetHeight(x, z) * scale;
+    vertices[*index] = this->get_height(x, z) * scale;
     (*index)++;
     vertices[*index] = z * scale;
     (*index)++;
@@ -154,7 +157,7 @@ void DiamondSquare::GenerateHeightMap() {
     float randNum;
     int stepSize = max_size_ - 1;
     int randInt = 100;
-
+    int iterations = 0;
     while (stepSize > 1) {
 
         int halfSize = stepSize / 2;
@@ -164,7 +167,7 @@ void DiamondSquare::GenerateHeightMap() {
         for (int z = 0; z < max_size_ - 1; z += stepSize) {
             for (int x = 0; x < max_size_ - 1; x += stepSize) {
 
-                randNum = ((float) RandInRange(randInt)) / randInt;
+                randNum = ((float) RandInRange(randInt, true)) / randInt;
                 offset = randNum * scale * 2 - scale;
                 DiamondStep(x, z, stepSize, offset);
             }
@@ -174,7 +177,7 @@ void DiamondSquare::GenerateHeightMap() {
 
         for (int z = 0; z < max_size_; z += halfSize) {
             for (int x = 0; x < max_size_; x += halfSize) {
-                randNum = ((float) RandInRange(randInt)) / randInt;
+                randNum = ((float) RandInRange(randInt, true)) / randInt;
                 offset = randNum * scale * 2 - scale;
                 SquareStep(x, z, halfSize, offset);
             }
@@ -183,13 +186,21 @@ void DiamondSquare::GenerateHeightMap() {
         //   PrintGrid( "square: ");
 
         stepSize /= 2;
+        iterations++;
     }
+    cout << "ITERATIONS:" << iterations << endl;
 
     //This brings all the values down to where the camera initially begins
     float heightOffset = height_map_[0][0];
     for (int z = 0; z < max_size_; z++) {
         for (int x = 0; x < max_size_; x++) {
             height_map_[z][x] -= heightOffset - 1;
+            if (height_map_[z][x] < this->min_height_) {
+                this->min_height_ = height_map_[z][x];
+            }
+            if (height_map_[z][x] > this->max_height_) {
+                this->max_height_ = height_map_[z][x];
+            }
         }
     }
 }
@@ -203,10 +214,10 @@ void DiamondSquare::GenerateHeightMap() {
  * @param offset
  */
 void DiamondSquare::SquareStep(int x, int z, int step, float offset) {
-    float values[4] = {GetWrappedHeight(x, z),
-                       GetWrappedHeight(x, z + step),
-                       GetWrappedHeight(x + step, z),
-                       GetWrappedHeight(x + step, z + step)};
+    float values[4] = {get_wrapped_height(x, z),
+                       get_wrapped_height(x, z + step),
+                       get_wrapped_height(x + step, z),
+                       get_wrapped_height(x + step, z + step)};
 
     float average = AverageValues(values);
     this->height_map_.at(x).at(z) = average + offset;
@@ -224,10 +235,10 @@ void DiamondSquare::SquareStep(int x, int z, int step, float offset) {
 void DiamondSquare::DiamondStep(int x, int z, int step, float offset) {
     int halfStep = step / 2;
 
-    float values[4] = {GetWrappedHeight(x - step, z),
-                       GetWrappedHeight(x + step, z),
-                       GetWrappedHeight(x, z + step),
-                       GetWrappedHeight(x, z - step)};
+    float values[4] = {get_wrapped_height(x - step, z),
+                       get_wrapped_height(x + step, z),
+                       get_wrapped_height(x, z + step),
+                       get_wrapped_height(x, z - step)};
     float average = AverageValues(values);
     this->height_map_.at(x + halfStep).at(z + halfStep) = average + offset;
 }
@@ -287,6 +298,10 @@ void DiamondSquare::GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, 
             }
         }
     }
+
+    //ensure the max and min heights adhere to the scale
+    this->max_height_ *= scale;
+    this->min_height_ *= scale;
 }
 
 /* HELPER FUNCTIONS */
@@ -353,10 +368,10 @@ void DiamondSquare::PrintGrid(string initial, bool show_zero) {
  * @param range
  * @return
  */
-int DiamondSquare::RandInRange(int range) {
+int DiamondSquare::RandInRange(int range, bool negative) {
     int randNum = rand() % range + 1;
 
-    if (rand() % 3 == 1) {
+    if (negative && rand() % 3 == 1) {
         return randNum * -1;
     } else {
         return randNum;
@@ -370,5 +385,13 @@ void DiamondSquare::ResizeVector(std::vector<std::vector<float> > &vec, const un
     for (auto &it : vec) {
         it.resize(COLUMNS);
     }
+}
+
+float DiamondSquare::get_max_height() const {
+    return max_height_;
+}
+
+float DiamondSquare::get_min_height() const {
+    return min_height_;
 }
 
