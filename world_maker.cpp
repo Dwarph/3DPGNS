@@ -127,7 +127,7 @@ void WorldMaker::MakeWorld(GLuint *terrain_vertex_buffers,
  */
 void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
 
-    trees_.push_back(LSystem("X", 7, 20, 0.3));
+    trees_.push_back(LSystem("X", 7, 20, 0.3 * (this->terrain_scale_ / 10)));
 
     Rule ruleX, ruleF;
     ruleX.axiom = 'X';
@@ -137,13 +137,13 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
     trees_.at(0).AddRule(ruleX);
     trees_.at(0).AddRule(ruleF);
 
-    trees_.push_back(LSystem("X", 7, 25.7, 0.3));
+    trees_.push_back(LSystem("X", 7, 25.7, 0.3 * (this->terrain_scale_ / 10)));
     ruleX.axiom = 'X';
     ruleX.rule = "F[+X][-X]FX";
     trees_.at(1).AddRule(ruleX);
     trees_.at(1).AddRule(ruleF);
 
-    trees_.push_back(LSystem("X", 5, 22.7, 0.3));
+    trees_.push_back(LSystem("X", 5, 22.7, 0.8 * (this->terrain_scale_ / 10)));
     ruleX.axiom = 'X';
     ruleX.rule = "F-[[X]+]+F[+FX]-X";
     trees_.at(2).AddRule(ruleX);
@@ -239,18 +239,10 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> gl_terrain
     g_color_buffer_data.resize(get_no_of_terrain_vertex_arrays(),
                                vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
 
-
-    cout << "MAX: " << diamond_square_->get_max_height() << endl;
-    cout << "MIN: " << diamond_square_->get_min_height() << endl;
-
-    float height_range = diamond_square_->get_max_height() - diamond_square_->get_min_height();
-    float height, rand_num;
-
-//    VertexColourRainbow(g_color_buffer_data);
-//    VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts, height_range);
-//    VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
+//  VertexColourRainbow(g_color_buffer_data);
+//  VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts, height_range);
+//  VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
     VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
-
 
     for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
         glGenBuffers(1, &diamond_square_colour_buffers[i]);
@@ -281,7 +273,8 @@ void WorldMaker::VertexColourRainbow(vector<vector<GLfloat>> &g_color_buffer_dat
  * @param height_range
  */
 void WorldMaker::VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_data,
-                                       vector<vector<GLfloat>> gl_terrain_verts, float height_range) {
+                                       vector<vector<GLfloat>> gl_terrain_verts) {
+    float height_range = diamond_square_->get_max_height() - diamond_square_->get_min_height();
 
     for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamond_square_->get_no_of_vertices(); j += 3) {
@@ -347,7 +340,6 @@ WorldMaker::VertexColourReal(vector<vector<GLfloat>> &g_color_buffer_data, vecto
                 g_color_buffer_data[i][j] = colours.snow_white[1] * rand_num;
                 g_color_buffer_data[i][j + 1] = colours.snow_white[2] * rand_num;
             }
-
         }
     }
 }

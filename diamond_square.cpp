@@ -27,6 +27,7 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
 
     // sets our width & depth size
     this->max_size_ = max;
+//    cout << "noofterr: " << no_of_terrain_vertex_arrays << endl;
 
     //resizes our height_map_ vector appropriately
     ResizeVector(height_map_, max, max);
@@ -46,21 +47,7 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
 
     this->roughness_ = 0.15;
 
-
     cout << "ROUGH: " << this->roughness_ << endl;
-
-    //seeds the initial values of the heightmap to 0
-    for (int i = 0; i < max; i++) {
-        for (int j = 0; j < max; j++) {
-            height_map_.at(i).at(j) = 0;
-        }
-    }
-
-    //sets the four corners of the heightmap to a random height between 0 & 1
-    this->height_map_.at(0).at(0) = (max * RandInRange(10, true) % 10);
-    this->height_map_.at(max - 1).at(0) = (max * RandInRange(10, true) % 10);
-    this->height_map_.at(max - 1).at(max - 1) = (max * RandInRange(10, true) % 10);
-    this->height_map_.at(0).at(max - 1) = (max * RandInRange(10, true) % 10);
 
     //generates the height map
     this->GenerateHeightMap();
@@ -158,6 +145,22 @@ void DiamondSquare::GenerateHeightMap() {
     int stepSize = max_size_ - 1;
     int randInt = 100;
     int iterations = 0;
+
+
+    //seeds the initial values of the heightmap to 0
+    for (int i = 0; i < this->max_size_; i++) {
+        for (int j = 0; j < this->max_size_; j++) {
+            height_map_.at(i).at(j) = 0;
+        }
+    }
+
+    //sets the four corners of the heightmap to a random height between 0 & 1
+    this->height_map_.at(0).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(this->max_size_ - 1).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(this->max_size_ - 1).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(0).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) % 10);
+
+
     while (stepSize > 1) {
 
         int halfSize = stepSize / 2;
@@ -302,6 +305,9 @@ void DiamondSquare::GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, 
     //ensure the max and min heights adhere to the scale
     this->max_height_ *= scale;
     this->min_height_ *= scale;
+
+    cout << "MAX: " << this->get_max_height() << endl;
+    cout << "MIN: " << this->get_min_height() << endl;
 }
 
 /* HELPER FUNCTIONS */
@@ -394,4 +400,3 @@ float DiamondSquare::get_max_height() const {
 float DiamondSquare::get_min_height() const {
     return min_height_;
 }
-
