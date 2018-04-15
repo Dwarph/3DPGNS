@@ -28,7 +28,7 @@ public:
 
     WorldMaker(int terrain_size, float scale);
 
-    void MakeWorld(GLuint *terrain_vertex_buffers,
+    void MakeWorld(vector<GLuint *> *terrain_vertex_buffers,
                    GLuint *diamond_square_colour_buffers,
                    GLuint *tree_vertex_buffer,
                    GLuint *tree_position_vertex_buffer);
@@ -36,8 +36,6 @@ public:
     int get_no_of_terrain_vertex_arrays();
 
     int get_terrain_size() const;
-
-    float get_terrain_scale() const;
 
     vector<int> get_num_trees_() const;
 
@@ -49,9 +47,11 @@ public:
 
     const int get_num_l_systems() const;
 
+    float get_terrain_scale() const;
+
 private:
     int terrain_size_;
-    float terrain_scale_;
+    int terrain_scale_;
     DiamondSquare *diamond_square_;
     std::vector<LSystem> trees_;
     std::vector<int> num_trees_;
@@ -59,7 +59,7 @@ private:
 
 
     void
-    ComputeDiamondSquareBuffers(GLuint *vertex_buffers, GLuint *diamond_square_colour_buffers);
+    ComputeDiamondSquareBuffers(vector<GLuint *> *terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
 
     void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> gl_terrain_verts,
                                            GLuint *diamond_square_colour_buffers);

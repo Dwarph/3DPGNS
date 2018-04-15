@@ -19,10 +19,10 @@
 
 WorldMaker::WorldMaker(int terrain_size, float scale) : terrain_size_(terrain_size), terrain_scale_(scale) {
     int max = (pow(2, terrain_size)) + 1;
-    this->diamond_square_ = new DiamondSquare(max, 10, get_no_of_terrain_vertex_arrays());
+    this->diamond_square_ = new DiamondSquare(max, 10, get_no_of_terrain_vertex_arrays(), terrain_size);
     this->num_trees_ = {0, 0, 0};
     this->trees_;
-    this->diamond_square_->ResizeVector(this->tree_positions_, 3, 0);
+    this->diamond_square_->ResizeVector2(this->tree_positions_, 3, 0);
 }
 
 /* Getters and Setters */
@@ -112,7 +112,7 @@ const int WorldMaker::get_num_l_systems() const {
  * @param tree_vertex_buffer
  * @param tree_position_vertex_buffer
  */
-void WorldMaker::MakeWorld(GLuint *terrain_vertex_buffers,
+void WorldMaker::MakeWorld(vector<GLuint *> *terrain_vertex_buffers,
                            GLuint *diamond_square_colour_buffers,
                            GLuint *tree_vertex_buffer,
                            GLuint *tree_position_vertex_buffer) {
@@ -185,7 +185,9 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
 
                 tree_num = diamond_square_->RandInRange(this->num_trees_.size(), false) - 1;
                 this->tree_positions_.at(tree_num).push_back(x * this->terrain_scale_);
-                this->tree_positions_.at(tree_num).push_back(diamond_square_->get_height(x, z) * this->terrain_scale_);
+                this->tree_positions_.at(tree_num).push_back(
+                        diamond_square_->get_height(diamond_square_->get_no_of_vertices() - 1, x, z) *
+                        this->terrain_scale_);
                 this->tree_positions_.at(tree_num).push_back(z * this->terrain_scale_);
                 this->num_trees_.at(tree_num)++;
             }
@@ -203,26 +205,30 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
 
 /**
  * Works out the Diamond Square Vertex buffers
- * @param vertex_buffers
+ * @param terrain_vertex_buffers
  * @param diamond_square_colour_buffers
  */
 void
-WorldMaker::ComputeDiamondSquareBuffers(GLuint *vertex_buffers, GLuint *diamond_square_colour_buffers) {
+WorldMaker::ComputeDiamondSquareBuffers(vector<GLuint *> *terrain_vertex_buffers,
+                                        GLuint *diamond_square_colour_buffers) {
 
-    vector<vector<GLfloat>> gl_terrain_verts;
-    gl_terrain_verts.resize(get_no_of_terrain_vertex_arrays(),
-                            vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
+    vector<vector<vector<GLfloat>>> gl_terrain_verts;
+//    gl_terrain_verts.resize(get_no_of_terrain_vertex_arrays(),
+//                            vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
 
     diamond_square_->GenerateVertices(gl_terrain_verts, this->terrain_scale_);
 
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
-        glGenBuffers(1, &vertex_buffers[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[i]);
-        glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i].size() * sizeof(float), &gl_terrain_verts[i][0],
-                     GL_STATIC_DRAW);
+    for (int i = 0; i < diamond_square_->get_no_of_iterations(); ++i) {
+        for (int j = 0; j < get_no_of_terrain_vertex_arrays(); j++) {
+            glGenBuffers(1, terrain_vertex_buffers[i][j]);
+            glBindBuffer(GL_ARRAY_BUFFER, *terrain_vertex_buffers[i][j]);
+            glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[j].size() * sizeof(float), &gl_terrain_verts[j][0],
+                         GL_STATIC_DRAW);
+        }
     }
 
-    ComputeDiamondSquareColourBuffers(gl_terrain_verts, diamond_square_colour_buffers);
+    ComputeDiamondSquareColourBuffers(gl_terrain_verts.at(diamond_square_->get_no_of_iterations() - 1),
+                                      diamond_square_colour_buffers);
 
 }
 

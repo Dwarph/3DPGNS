@@ -20,7 +20,9 @@
  * @param no_of_terrain_vertex_arrays
  */
 
-DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays) {
+DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays, int no_of_iterations) {
+
+    this->no_of_iterations = no_of_iterations;
 
     this->max_height_ = 0;
     this->min_height_ = 0;
@@ -30,7 +32,8 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
 //    cout << "noofterr: " << no_of_terrain_vertex_arrays << endl;
 
     //resizes our height_map_ vector appropriately
-    ResizeVector(height_map_, max, max);
+//    ResizeVector2(height_map_.at(0), max, max);
+    ResizeVector3(height_map_, this->no_of_iterations, max, max);
 
     //provides us with the number of terrain vertex arrays
     this->no_of_terrain_vertex_arrays_ = no_of_terrain_vertex_arrays;
@@ -70,9 +73,9 @@ int DiamondSquare::get_max_size() const {
  * @param z
  * @return
  */
-float DiamondSquare::get_height(int x, int z) {
+float DiamondSquare::get_height(int grid_num, int x, int z) {
     //gets the heights at the appropriate index
-    return height_map_.at(x).at(z);
+    return height_map_.at(grid_num).at(x).at(z);
 }
 
 /**
@@ -83,7 +86,7 @@ float DiamondSquare::get_height(int x, int z) {
  * @param z
  * @return
  */
-float DiamondSquare::get_wrapped_height(int x, int z) {
+float DiamondSquare::get_wrapped_height(int grid_num, int x, int z) {
 
     //this allows for all values to be based off of 4 values, by wrapping the squares and diamonds.
     if (x < 0) {
@@ -98,7 +101,7 @@ float DiamondSquare::get_wrapped_height(int x, int z) {
         z = z - (this->max_size_ - 1);
     }
 
-    return this->height_map_.at(x).at(z);
+    return this->height_map_.at(grid_num).at(x).at(z);
 }
 
 /**
@@ -109,11 +112,15 @@ int DiamondSquare::get_no_of_vertices() {
     return this->no_of_vertices_;
 }
 
+int DiamondSquare::get_no_of_iterations() {
+    return this->no_of_iterations;
+}
+
 /**
  * Returns the height_map
  * @return
  */
-vector<vector<float>> DiamondSquare::get_height_map() {
+vector<vector<vector<float>>> DiamondSquare::get_height_map() {
     return height_map_;
 }
 
@@ -125,13 +132,15 @@ vector<vector<float>> DiamondSquare::get_height_map() {
  * @param z
  * @param scale
  */
-void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int x, int z, float scale) {
-    vertices[*index] = x * scale;
-    (*index)++;
-    vertices[*index] = this->get_height(x, z) * scale;
-    (*index)++;
-    vertices[*index] = z * scale;
-    (*index)++;
+void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale) {
+    if (this->get_height(grid_num, x, z) != 0) {
+        vertices[*index] = x * scale;
+        (*index)++;
+        vertices[*index] = this->get_height(grid_num, x, z) * scale;
+        (*index)++;
+        vertices[*index] = z * scale;
+        (*index)++;
+    }
 }
 
 /* Main Functions */
@@ -150,15 +159,16 @@ void DiamondSquare::GenerateHeightMap() {
     //seeds the initial values of the heightmap to 0
     for (int i = 0; i < this->max_size_; i++) {
         for (int j = 0; j < this->max_size_; j++) {
-            height_map_.at(i).at(j) = 0;
+            height_map_.at(0).at(0).at(0) = 0.0f;
         }
     }
 
     //sets the four corners of the heightmap to a random height between 0 & 1
-    this->height_map_.at(0).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
-    this->height_map_.at(this->max_size_ - 1).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
-    this->height_map_.at(this->max_size_ - 1).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) % 10);
-    this->height_map_.at(0).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(0).at(0).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(0).at(this->max_size_ - 1).at(0) = (this->max_size_ * RandInRange(10, true) % 10);
+    this->height_map_.at(0).at(this->max_size_ - 1).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) %
+                                                                               10);
+    this->height_map_.at(0).at(0).at(this->max_size_ - 1) = (this->max_size_ * RandInRange(10, true) % 10);
 
 
     while (stepSize > 1) {
@@ -172,7 +182,7 @@ void DiamondSquare::GenerateHeightMap() {
 
                 randNum = ((float) RandInRange(randInt, true)) / randInt;
                 offset = randNum * scale * 2 - scale;
-                DiamondStep(x, z, stepSize, offset);
+                DiamondStep(iterations, x, z, stepSize, offset);
             }
         }
 
@@ -182,7 +192,7 @@ void DiamondSquare::GenerateHeightMap() {
             for (int x = 0; x < max_size_; x += halfSize) {
                 randNum = ((float) RandInRange(randInt, true)) / randInt;
                 offset = randNum * scale * 2 - scale;
-                SquareStep(x, z, halfSize, offset);
+                SquareStep(iterations, x, z, halfSize, offset);
             }
         }
 
@@ -190,19 +200,30 @@ void DiamondSquare::GenerateHeightMap() {
 
         stepSize /= 2;
         iterations++;
+
+
+        if (iterations != this->no_of_iterations) {
+            for (int z = 0; z < max_size_; z += halfSize) {
+                for (int x = 0; x < max_size_; x += halfSize) {
+                    this->get_height_map().push_back(this->get_height_map().at(iterations - 1));
+                }
+            }
+        }
     }
     cout << "ITERATIONS:" << iterations << endl;
 
     //This brings all the values down to where the camera initially begins
-    float heightOffset = height_map_[0][0];
-    for (int z = 0; z < max_size_; z++) {
-        for (int x = 0; x < max_size_; x++) {
-            height_map_[z][x] -= heightOffset - 1;
-            if (height_map_[z][x] < this->min_height_) {
-                this->min_height_ = height_map_[z][x];
-            }
-            if (height_map_[z][x] > this->max_height_) {
-                this->max_height_ = height_map_[z][x];
+    float heightOffset = height_map_[height_map_.size() - 1][0][0];
+    for (int grid_num = 0; grid_num < height_map_.size(); grid_num++) {
+        for (int z = 0; z < max_size_; z++) {
+            for (int x = 0; x < max_size_; x++) {
+                height_map_[grid_num][z][x] -= heightOffset - 1;
+                if (height_map_[grid_num][z][x] < this->min_height_) {
+                    this->min_height_ = height_map_[grid_num][z][x];
+                }
+                if (height_map_[grid_num][z][x] > this->max_height_) {
+                    this->max_height_ = height_map_[grid_num][z][x];
+                }
             }
         }
     }
@@ -216,14 +237,14 @@ void DiamondSquare::GenerateHeightMap() {
  * @param step
  * @param offset
  */
-void DiamondSquare::SquareStep(int x, int z, int step, float offset) {
-    float values[4] = {get_wrapped_height(x, z),
-                       get_wrapped_height(x, z + step),
-                       get_wrapped_height(x + step, z),
-                       get_wrapped_height(x + step, z + step)};
+void DiamondSquare::SquareStep(int grid_num, int x, int z, int step, float offset) {
+    float values[4] = {get_wrapped_height(grid_num, x, z),
+                       get_wrapped_height(grid_num, x, z + step),
+                       get_wrapped_height(grid_num, x + step, z),
+                       get_wrapped_height(grid_num, x + step, z + step)};
 
     float average = AverageValues(values);
-    this->height_map_.at(x).at(z) = average + offset;
+    this->height_map_.at(grid_num).at(x).at(z) = average + offset;
 }
 
 /**
@@ -235,15 +256,15 @@ void DiamondSquare::SquareStep(int x, int z, int step, float offset) {
  * @param step
  * @param offset
  */
-void DiamondSquare::DiamondStep(int x, int z, int step, float offset) {
+void DiamondSquare::DiamondStep(int grid_num, int x, int z, int step, float offset) {
     int halfStep = step / 2;
 
-    float values[4] = {get_wrapped_height(x - step, z),
-                       get_wrapped_height(x + step, z),
-                       get_wrapped_height(x, z + step),
-                       get_wrapped_height(x, z - step)};
+    float values[4] = {get_wrapped_height(grid_num, x - step, z),
+                       get_wrapped_height(grid_num, x + step, z),
+                       get_wrapped_height(grid_num, x, z + step),
+                       get_wrapped_height(grid_num, x, z - step)};
     float average = AverageValues(values);
-    this->height_map_.at(x + halfStep).at(z + halfStep) = average + offset;
+    this->height_map_.at(grid_num).at(x + halfStep).at(z + halfStep) = average + offset;
 }
 
 /**
@@ -251,7 +272,7 @@ void DiamondSquare::DiamondStep(int x, int z, int step, float offset) {
  * @param gl_terrain_verts
  * @param scale
  */
-void DiamondSquare::GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, float scale) {
+void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain_verts, float scale) {
 
     //used to keep track of the index we are currently on
     int index = 0;
@@ -263,45 +284,46 @@ void DiamondSquare::GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, 
     //iterates over the depth (z) and the width (x)
     //then iterates 3 times for each vertice in a triangle
     //and 2 times for 2 triangles per square
-    for (int z = 0; z < this->max_size_ - 1; z++) {
-        for (int x = 0; x < this->max_size_ - 1; x++) {
-            for (int j = 0; j < 2; j++) {
-                for (int i = 0; i < 3; i++) {
-                    if (index >= this->no_of_vertices_) {
-                        count++;
-                        index = 0;
-                    }
+    for (int itr = 0; itr < no_of_iterations; itr++) {
+        for (int z = 0; z < this->max_size_ - 1; z++) {
+            for (int x = 0; x < this->max_size_ - 1; x++) {
+                for (int j = 0; j < 2; j++) {
+                    for (int i = 0; i < 3; i++) {
+                        if (index >= this->no_of_vertices_) {
+                            count++;
+                            index = 0;
+                        }
 
-                    switch (i) {
-                        case 0:
-                            if (j == 0) {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x, z, scale);
-                            } else {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x + 1, z, scale);
-                            }
-                            break;
+                        switch (i) {
+                            case 0:
+                                if (j == 0) {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z, scale);
+                                } else {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale);
+                                }
+                                break;
 
-                        case 1:
-                            if (j == 0) {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x, z + 1, scale);
-                            } else {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x, z + 1, scale);
-                            }
-                            break;
+                            case 1:
+                                if (j == 0) {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale);
+                                } else {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale);
+                                }
+                                break;
 
-                        case 2:
-                            if (j == 0) {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x + 1, z, scale);
-                            } else {
-                                set_vert_at_point(gl_terrain_verts[count], &index, x + 1, z + 1, scale);
-                            }
-                            break;
+                            case 2:
+                                if (j == 0) {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale);
+                                } else {
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z + 1, scale);
+                                }
+                                break;
+                        }
                     }
                 }
             }
         }
     }
-
     //ensure the max and min heights adhere to the scale
     this->max_height_ *= scale;
     this->min_height_ *= scale;
@@ -343,7 +365,7 @@ float DiamondSquare::AverageValues(float *values) {
  * If show_zero is true, then zeros are also displayed
  * @param initial
  */
-void DiamondSquare::PrintGrid(string initial, bool show_zero) {
+void DiamondSquare::PrintGrid(int grid_num, string initial, bool show_zero) {
 
     //sets the precision of the outputted values
     std::cout << std::fixed;
@@ -353,13 +375,14 @@ void DiamondSquare::PrintGrid(string initial, bool show_zero) {
     for (int j = 0; j < this->max_size_; j++) {
         for (int i = 0; i < this->max_size_; i++) {
 
-            if (this->height_map_.at(i).at(j) == 0) {
+            if (this->height_map_.at(grid_num).at(i).at(j) == 0) {
 
                 //if show_zero is true, display the values with zero. Else just display a space char
-                !show_zero ? cout << " " << " " << "\t" : cout << " " << this->height_map_.at(i).at(j) << "\t";
+                !show_zero ? cout << " " << " " << "\t" : cout << " " << this->height_map_.at(grid_num).at(i).at(j)
+                                                               << "\t";
 
             } else {
-                cout << " " << this->height_map_.at(i).at(j) << "\t";
+                cout << " " << this->height_map_.at(grid_num).at(i).at(j) << "\t";
 
             }
         }
@@ -385,12 +408,26 @@ int DiamondSquare::RandInRange(int range, bool negative) {
 }
 
 //http://www.cplusplus.com/forum/beginner/102670/ source
-void DiamondSquare::ResizeVector(std::vector<std::vector<float> > &vec, const unsigned short ROWS,
-                                 const unsigned short COLUMNS) {
+void DiamondSquare::ResizeVector2(std::vector<std::vector<float> > &vec, const unsigned short ROWS,
+                                  const unsigned short COLUMNS) {
     vec.resize(ROWS);
     for (auto &it : vec) {
         it.resize(COLUMNS);
     }
+}
+
+//http://www.cplusplus.com/forum/beginner/102670/ source
+void DiamondSquare::ResizeVector3(std::vector<std::vector<std::vector<float> > > &vec, const unsigned short DEPTH,
+                                  const unsigned short ROWS,
+                                  const unsigned short COLUMNS) {
+    vec.resize(DEPTH);
+    for (int i = 0; i < vec.size(); ++i) {
+        vec.at(i).resize(ROWS);
+        for (int j = 0; j < vec.at(i).size(); ++j) {
+            vec.at(i).at(j).resize(COLUMNS);
+        }
+    }
+
 }
 
 float DiamondSquare::get_max_height() const {

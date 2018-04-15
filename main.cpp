@@ -109,12 +109,12 @@ int OpenGLMagic() {
 
 
     /** Bind vertices to buffer**/
-    GLuint diamond_square_vertex_buffers[world_maker.get_no_of_terrain_vertex_arrays()];
+    vector<GLuint *> diamond_square_vertex_buffers;
     GLuint diamond_square_colour_buffers[world_maker.get_no_of_terrain_vertex_arrays()];
     GLuint tree_vertex_buffer[world_maker.get_num_l_systems()];
     GLuint tree_position_vertex_buffer[world_maker.get_num_l_systems()];
 
-    world_maker.MakeWorld(diamond_square_vertex_buffers,
+    world_maker.MakeWorld(&diamond_square_vertex_buffers,
                           diamond_square_colour_buffers,
                           tree_vertex_buffer, tree_position_vertex_buffer);
 
@@ -147,7 +147,7 @@ int OpenGLMagic() {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[i]);
+            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[world_maker.get_terrain_size() - 1][i]);
             glVertexAttribPointer(
                     0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
                     3,                  // size
@@ -224,7 +224,7 @@ int OpenGLMagic() {
 
 // Cleanup VBO and shader
     for (int i = 0; i < world_maker.get_no_of_terrain_vertex_arrays(); i++) {
-        glDeleteBuffers(1, &diamond_square_vertex_buffers[i]);
+        glDeleteBuffers(1, &diamond_square_vertex_buffers[world_maker.get_terrain_size()][i]);
         glDeleteBuffers(1, &diamond_square_colour_buffers[i]);
     }
 

@@ -22,15 +22,15 @@ class DiamondSquare {
 
 public:
 
-    DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays);
+    DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays, int no_of_iterations);
 
-    vector<vector<float>> get_height_map();
+    vector<vector<vector<float>>> get_height_map();
 
     void GenerateHeightMap();
 
-    void GenerateVertices(vector<vector<GLfloat>> &gl_terrain_verts, float scale);
+    void GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain_verts, float scale);
 
-    float get_height(int x, int z);
+    float get_height(int grid_num, int x, int z);
 
     int RandInRange(int range, bool negative);
 
@@ -42,28 +42,34 @@ public:
 
     float get_min_height() const;
 
-    void ResizeVector(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
+    int get_no_of_iterations();
+
+    void ResizeVector2(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
+
+    void ResizeVector3(std::vector<std::vector<std::vector<float> > > &vec, const unsigned short ROWS,
+                       const unsigned short COLUMNS, const unsigned short DEPTH);
 
 private :
 
     int max_size_;
     int no_of_vertices_;
+    int no_of_iterations;
     float roughness_;
-    vector<vector<float>> height_map_;
+    vector<vector<vector<float>>> height_map_;
     int no_of_terrain_vertex_arrays_;
     float max_height_;
     float min_height_;
 
-    float get_wrapped_height(int x, int z);
+    float get_wrapped_height(int grid_num, int x, int z);
 
-    void DiamondStep(int x, int z, int step, float offset);
+    void DiamondStep(int grid_num, int x, int z, int step, float offset);
 
-    void SquareStep(int x, int z, int step, float offset);
+    void SquareStep(int grid_num, int x, int z, int step, float offset);
 
 
-    void set_vert_at_point(vector<GLfloat> &verts, int *index, int x, int z, float scale);
+    void set_vert_at_point(vector<GLfloat> &verts, int *index, int grid_num, int x, int z, float scale);
 
-    void PrintGrid(string initial, bool show_zero);
+    void PrintGrid(int grid_num, string initial, bool show_zero);
 
     float AverageValues(float *values);
 
