@@ -28,7 +28,7 @@ public:
 
     WorldMaker(int terrain_size, float scale);
 
-    void MakeWorld(vector<GLuint *> *terrain_vertex_buffers,
+    void MakeWorld(vector<vector<GLuint >> terrain_vertex_buffers,
                    GLuint *diamond_square_colour_buffers,
                    GLuint *tree_vertex_buffer,
                    GLuint *tree_position_vertex_buffer);
@@ -59,7 +59,7 @@ private:
 
 
     void
-    ComputeDiamondSquareBuffers(vector<GLuint *> *terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
+    ComputeDiamondSquareBuffers(vector<vector<GLuint >> terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
 
     void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> gl_terrain_verts,
                                            GLuint *diamond_square_colour_buffers);

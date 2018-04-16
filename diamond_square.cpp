@@ -134,11 +134,11 @@ vector<vector<vector<float>>> DiamondSquare::get_height_map() {
  */
 void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale) {
     if (this->get_height(grid_num, x, z) != 0) {
-        vertices[*index] = x * scale;
+        vertices.push_back(x * scale);
         (*index)++;
-        vertices[*index] = this->get_height(grid_num, x, z) * scale;
+        vertices.push_back(this->get_height(grid_num, x, z) * scale);
         (*index)++;
-        vertices[*index] = z * scale;
+        vertices.push_back(z * scale);
         (*index)++;
     }
 }
@@ -203,11 +203,11 @@ void DiamondSquare::GenerateHeightMap() {
 
 
         if (iterations != this->no_of_iterations) {
-            for (int z = 0; z < max_size_; z += halfSize) {
-                for (int x = 0; x < max_size_; x += halfSize) {
-                    this->get_height_map().push_back(this->get_height_map().at(iterations - 1));
-                }
-            }
+//            for (int z = 0; z < max_size_; z += halfSize) {
+//                for (int x = 0; x < max_size_; x += halfSize) {
+            this->get_height_map().push_back(this->get_height_map().at(iterations - 1));
+//                }
+//        }
         }
     }
     cout << "ITERATIONS:" << iterations << endl;
@@ -285,6 +285,8 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
     //then iterates 3 times for each vertice in a triangle
     //and 2 times for 2 triangles per square
     for (int itr = 0; itr < no_of_iterations; itr++) {
+        count = 0;
+        index = 0;
         for (int z = 0; z < this->max_size_ - 1; z++) {
             for (int x = 0; x < this->max_size_ - 1; x++) {
                 for (int j = 0; j < 2; j++) {

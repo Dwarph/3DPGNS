@@ -109,12 +109,20 @@ int OpenGLMagic() {
 
 
     /** Bind vertices to buffer**/
-    vector<GLuint *> diamond_square_vertex_buffers;
+    vector<vector<GLuint >> diamond_square_vertex_buffers;
+
+
+    diamond_square_vertex_buffers.resize(world_maker.get_diamond_square()->get_no_of_iterations());
+    for (int i = 0; i < diamond_square_vertex_buffers.size(); i++) {
+        diamond_square_vertex_buffers.at(i).resize(world_maker.get_no_of_terrain_vertex_arrays());
+    }
+
+
     GLuint diamond_square_colour_buffers[world_maker.get_no_of_terrain_vertex_arrays()];
     GLuint tree_vertex_buffer[world_maker.get_num_l_systems()];
     GLuint tree_position_vertex_buffer[world_maker.get_num_l_systems()];
 
-    world_maker.MakeWorld(&diamond_square_vertex_buffers,
+    world_maker.MakeWorld(diamond_square_vertex_buffers,
                           diamond_square_colour_buffers,
                           tree_vertex_buffer, tree_position_vertex_buffer);
 
