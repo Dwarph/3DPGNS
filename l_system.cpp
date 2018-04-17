@@ -134,7 +134,6 @@ void LSystem::GenerateVertices() {
 //
 //            current_position = translation * rotationMatrixZ * current_position;
 
-
             // rotation only able to be applied in 2D space - but it works in 2D!
             current_position.x = current_position.x + (glm::cos(angle.z + glm::radians(90.0f)));
             current_position.y = current_position.y + (glm::sin(angle.z + glm::radians(90.0f)));

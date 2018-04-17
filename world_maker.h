@@ -54,7 +54,7 @@ private:
     int terrain_scale_;
     DiamondSquare *diamond_square_;
     std::vector<LSystem> trees_;
-    std::vector<int> num_trees_;
+    std::vector<int> num_l_systems_;
     std::vector<vector<GLfloat>> tree_positions_;
 
 

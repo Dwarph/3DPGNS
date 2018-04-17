@@ -20,7 +20,7 @@
 WorldMaker::WorldMaker(int terrain_size, float scale) : terrain_size_(terrain_size), terrain_scale_(scale) {
     int max = (pow(2, terrain_size)) + 1;
     this->diamond_square_ = new DiamondSquare(max, 10, get_no_of_terrain_vertex_arrays(), terrain_size);
-    this->num_trees_ = {0, 0, 0};
+    this->num_l_systems_ = {0, 0, 0};
     this->trees_;
     this->diamond_square_->ResizeVector2(this->tree_positions_, 3, 0);
 }
@@ -65,7 +65,7 @@ const vector<vector<GLfloat>> &WorldMaker::get_tree_positions_() const {
  * @return
  */
 vector<int> WorldMaker::get_num_trees_() const {
-    return num_trees_;
+    return num_l_systems_;
 }
 
 /**
@@ -93,7 +93,7 @@ DiamondSquare *WorldMaker::get_diamond_square() const {
  * @return
  */
 const int WorldMaker::get_num_l_systems() const {
-    return this->num_trees_.size();
+    return this->num_l_systems_.size();
 }
 
 /* Main Functions */
@@ -127,7 +127,7 @@ void WorldMaker::MakeWorld(vector<vector<GLuint >> &terrain_vertex_buffers,
  */
 void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
 
-    trees_.push_back(LSystem("X", 7, 20, 0.3 * (this->terrain_scale_ / 10)));
+    trees_.push_back(LSystem("X", 7, 20, 0.3));
 
     Rule ruleX, ruleF;
     ruleX.axiom = 'X';
@@ -137,20 +137,20 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
     trees_.at(0).AddRule(ruleX);
     trees_.at(0).AddRule(ruleF);
 
-    trees_.push_back(LSystem("X", 7, 25.7, 0.3 * (this->terrain_scale_ / 10)));
+    trees_.push_back(LSystem("X", 7, 25.7, 0.3));
     ruleX.axiom = 'X';
     ruleX.rule = "F[+X][-X]FX";
     trees_.at(1).AddRule(ruleX);
     trees_.at(1).AddRule(ruleF);
 
-    trees_.push_back(LSystem("X", 5, 22.7, 0.8 * (this->terrain_scale_ / 10)));
+    trees_.push_back(LSystem("X", 5, 22.7, 0.8));
     ruleX.axiom = 'X';
     ruleX.rule = "F-[[X]+]+F[+FX]-X";
     trees_.at(2).AddRule(ruleX);
     trees_.at(2).AddRule(ruleF);
 
 
-    for (int i = 0; i < num_trees_.size(); ++i) {
+    for (int i = 0; i < num_l_systems_.size(); ++i) {
         trees_.at(i).GenerateFractal();
         trees_.at(i).GenerateVertices();
 
@@ -179,23 +179,30 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
  */
 void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer) {
     int tree_num = 0;
+
+    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
+    this->tree_positions_.at(tree_num).push_back(
+            diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, 0, 0) *
+            this->terrain_scale_);
+    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
+    this->num_l_systems_.at(tree_num)++;
+
     for (int x = 0; x < diamond_square_->get_max_size(); x++) {
         for (int z = 0; z < diamond_square_->get_max_size(); z++) {
             if (diamond_square_->RandInRange(200, false) == 3) {
 
-                tree_num = diamond_square_->RandInRange(this->num_trees_.size(), false) - 1;
-
+                tree_num = diamond_square_->RandInRange(this->num_l_systems_.size(), false) - 1;
                 this->tree_positions_.at(tree_num).push_back(x * this->terrain_scale_);
                 this->tree_positions_.at(tree_num).push_back(
                         diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, x, z) *
                         this->terrain_scale_);
                 this->tree_positions_.at(tree_num).push_back(z * this->terrain_scale_);
-                this->num_trees_.at(tree_num)++;
+                this->num_l_systems_.at(tree_num)++;
             }
         }
     }
 
-    for (int i = 0; i < num_trees_.size(); ++i) {
+    for (int i = 0; i < num_l_systems_.size(); ++i) {
 
         glGenBuffers(1, &tree_position_vertex_buffer[i]);
         glBindBuffer(GL_ARRAY_BUFFER, tree_position_vertex_buffer[i]);
