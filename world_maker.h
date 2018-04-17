@@ -28,7 +28,7 @@ public:
 
     WorldMaker(int terrain_size, float scale);
 
-    void MakeWorld(vector<vector<GLuint >> terrain_vertex_buffers,
+    void MakeWorld(vector<vector<GLuint >> &terrain_vertex_buffers,
                    GLuint *diamond_square_colour_buffers,
                    GLuint *tree_vertex_buffer,
                    GLuint *tree_position_vertex_buffer);
@@ -59,23 +59,23 @@ private:
 
 
     void
-    ComputeDiamondSquareBuffers(vector<vector<GLuint >> terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
+    ComputeDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
 
-    void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> gl_terrain_verts,
+    void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrain_verts,
                                            GLuint *diamond_square_colour_buffers);
 
     void ComputeLSystemVertexBuffer(GLuint *vertex_buffer);
 
     void VertexColourRainbow(vector<vector<GLfloat>> &g_color_buffer_data);
 
-    void VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_data, vector<vector<GLfloat>> gl_terrain_verts);
+    void VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_data, vector<vector<GLfloat>> &gl_terrain_verts);
 
     void VertexColourReal(vector<vector<GLfloat>> &g_color_buffer_data,
-                          vector<vector<GLfloat>> gl_terrain_verts,
+                          vector<vector<GLfloat>> &gl_terrain_verts,
                           ColourList colours);
 
     void VertexColourRealBlended(vector<vector<GLfloat>> &g_color_buffer_data,
-                                 vector<vector<GLfloat>> gl_terrain_verts,
+                                 vector<vector<GLfloat>> &gl_terrain_verts,
                                  ColourList colours);
 
     GLfloat *BlendColours(GLfloat *colour_one, GLfloat *colour_two, GLfloat *blended_colour, float percent);

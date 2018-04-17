@@ -32,8 +32,10 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
 //    cout << "noofterr: " << no_of_terrain_vertex_arrays << endl;
 
     //resizes our height_map_ vector appropriately
-//    ResizeVector2(height_map_.at(0), max, max);
-    ResizeVector3(height_map_, this->no_of_iterations, max, max);
+    height_map_.resize(1);
+    ResizeVector2(height_map_.at(0), max, max);
+//    ResizeVector3(height_map_, this->no_of_iterations, max, max);
+//    height_map_.resize(this->get_no_of_iterations());
 
     //provides us with the number of terrain vertex arrays
     this->no_of_terrain_vertex_arrays_ = no_of_terrain_vertex_arrays;
@@ -134,11 +136,11 @@ vector<vector<vector<float>>> DiamondSquare::get_height_map() {
  */
 void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale) {
     if (this->get_height(grid_num, x, z) != 0) {
-        vertices.push_back(x * scale);
+        vertices[*index] = x * scale;
         (*index)++;
-        vertices.push_back(this->get_height(grid_num, x, z) * scale);
+        vertices[*index] = this->get_height(grid_num, x, z) * scale;
         (*index)++;
-        vertices.push_back(z * scale);
+        vertices[*index] = z * scale;
         (*index)++;
     }
 }
@@ -155,11 +157,10 @@ void DiamondSquare::GenerateHeightMap() {
     int randInt = 100;
     int iterations = 0;
 
-
     //seeds the initial values of the heightmap to 0
     for (int i = 0; i < this->max_size_; i++) {
         for (int j = 0; j < this->max_size_; j++) {
-            height_map_.at(0).at(0).at(0) = 0.0f;
+            height_map_.at(0).at(i).at(j) = 0.0f;
         }
     }
 
@@ -201,33 +202,29 @@ void DiamondSquare::GenerateHeightMap() {
         stepSize /= 2;
         iterations++;
 
-
         if (iterations != this->no_of_iterations) {
-//            for (int z = 0; z < max_size_; z += halfSize) {
-//                for (int x = 0; x < max_size_; x += halfSize) {
-            this->get_height_map().push_back(this->get_height_map().at(iterations - 1));
-//                }
-//        }
+            this->height_map_.push_back(this->height_map_.at(iterations - 1));
         }
     }
     cout << "ITERATIONS:" << iterations << endl;
 
     //This brings all the values down to where the camera initially begins
     float heightOffset = height_map_[height_map_.size() - 1][0][0];
-    for (int grid_num = 0; grid_num < height_map_.size(); grid_num++) {
-        for (int z = 0; z < max_size_; z++) {
-            for (int x = 0; x < max_size_; x++) {
-                height_map_[grid_num][z][x] -= heightOffset - 1;
-                if (height_map_[grid_num][z][x] < this->min_height_) {
-                    this->min_height_ = height_map_[grid_num][z][x];
-                }
-                if (height_map_[grid_num][z][x] > this->max_height_) {
-                    this->max_height_ = height_map_[grid_num][z][x];
-                }
+    for (int z = 0; z < max_size_; z++) {
+        for (int x = 0; x < max_size_; x++) {
+            height_map_[this->get_no_of_iterations() - 1][z][x] -= heightOffset - 1;
+            if (height_map_[this->get_no_of_iterations() - 1][z][x] < this->min_height_) {
+                this->min_height_ = height_map_[this->get_no_of_iterations() - 1][z][x];
+            }
+            if (height_map_[this->get_no_of_iterations() - 1][z][x] > this->max_height_) {
+                this->max_height_ = height_map_[this->get_no_of_iterations() - 1][z][x];
             }
         }
     }
 }
+
+//    this->PrintGrid(this->get_no_of_iterations() - 1, "GRID", false);
+
 
 /**
  * This performs a "Square Step", getting values from 4 points surrounding the current point,
@@ -371,7 +368,7 @@ void DiamondSquare::PrintGrid(int grid_num, string initial, bool show_zero) {
 
     //sets the precision of the outputted values
     std::cout << std::fixed;
-    std::cout << std::setprecision(0);
+    std::cout << std::setprecision(2);
 
     cout << initial << endl;
     for (int j = 0; j < this->max_size_; j++) {
