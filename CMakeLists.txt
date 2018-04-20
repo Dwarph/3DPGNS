@@ -1,5 +1,3 @@
-
-
 # CMake entry point
 cmake_minimum_required(VERSION 3.9)
 
@@ -24,6 +22,13 @@ endif ()
 # Compile external dependencies
 add_subdirectory(external)
 
+
+add_definitions(-DBOOST_ALL_NO_LIB)
+
+# link against dynamic libraries
+add_definitions(-DBOOST_ALL_DYN_LINK)
+find_package(Boost COMPONENTS system unit_test_framework)
+
 # On Visual 2005 and above, this module can set the debug working directory
 cmake_policy(SET CMP0026 OLD)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/rpavlik-cmake-modules-fe2273")
@@ -34,7 +39,6 @@ if (INCLUDE_DISTRIB)
     add_subdirectory(distrib)
 endif (INCLUDE_DISTRIB)
 
-
 include_directories(
         external/AntTweakBar-1.16/include/
         external/glfw-3.1.2/include/GLFW/
@@ -44,11 +48,15 @@ include_directories(
         external/bullet-2.81-rev2613/src/
         .
 )
+find_package(Boost 1.62 REQUIRED COMPONENTS unit_test_framework)
 
 set(ALL_LIBS
         ${OPENGL_LIBRARY}
         glfw
         GLEW_1130
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
         )
 
 add_definitions(
@@ -69,6 +77,9 @@ add_executable(3DPGNS
         world_maker.cpp
         world_maker.h
 
+        Tests/test_diamond_square.cpp
+        Tests/test_diamond_square.h
+
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp
 
@@ -76,7 +87,11 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/controls.hpp
 
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
-        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader world_maker.cpp world_maker.h)
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader world_maker.cpp world_maker.h
+
+        Tests/test_diamond_square.cpp
+        Tests/test_diamond_square.h)
+
 
 target_link_libraries(3DPGNS
         ${ALL_LIBS}
@@ -84,5 +99,3 @@ target_link_libraries(3DPGNS
 
 set_target_properties(3DPGNS PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")
 create_target_launcher(3DPGNS WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")
-
-

@@ -212,9 +212,9 @@ int OpenGLMagic() {
             glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
             glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
 
-
-            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
-                                  world_maker.get_num_trees_()[i]);
+//
+//            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
+//                                  world_maker.get_num_trees_()[i]);
         }
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);

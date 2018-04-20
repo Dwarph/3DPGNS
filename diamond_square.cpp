@@ -18,6 +18,7 @@
  * @param max
  * @param rough_max
  * @param no_of_terrain_vertex_arrays
+ * @param int no_of_iterations
  */
 
 DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays, int no_of_iterations) {
@@ -114,8 +115,28 @@ int DiamondSquare::get_no_of_vertices() {
     return this->no_of_vertices_;
 }
 
+/**
+ * Returns the number of iterations
+ * @return
+ */
 int DiamondSquare::get_no_of_iterations() {
     return this->no_of_iterations;
+}
+
+/**
+ * Gets the max height of the terrain
+ * @return
+ */
+float DiamondSquare::get_max_height() const {
+    return max_height_;
+}
+
+/**
+ * Gets the min height of the terrain
+ * @return
+ */
+float DiamondSquare::get_min_height() const {
+    return min_height_;
 }
 
 /**
@@ -427,12 +448,4 @@ void DiamondSquare::ResizeVector3(std::vector<std::vector<std::vector<float> > >
         }
     }
 
-}
-
-float DiamondSquare::get_max_height() const {
-    return max_height_;
-}
-
-float DiamondSquare::get_min_height() const {
-    return min_height_;
 }
