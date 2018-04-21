@@ -5,16 +5,16 @@
 #include <glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <external/OpenGLTutorialUsefulFiles/shader.hpp>
-
 #include "world_maker.h"
 #include "external/OpenGLTutorialUsefulFiles/controls.hpp"
+#include "external/OpenGLTutorialUsefulFiles/shader.hpp"
 
 
 using namespace glm;
 using namespace std;
 
 GLFWwindow *window;
+
 
 /**
  * Sets up the GLFW window
@@ -23,6 +23,7 @@ GLFWwindow *window;
  */
 int WindowSetup() {
     // Initialise GLFW
+
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         getchar();
@@ -78,6 +79,7 @@ int WindowSetup() {
 //    glCullFace(GL_FRONT);
 }
 
+
 /**
  * Gets the vertices needed to pass to OpenGL & displays them in a draw loop.
  * @return
@@ -114,11 +116,11 @@ int OpenGLMagic() {
 
     diamond_square_vertex_buffers.resize(world_maker.get_diamond_square()->get_no_of_iterations());
     for (int i = 0; i < diamond_square_vertex_buffers.size(); i++) {
-        diamond_square_vertex_buffers.at(i).resize(world_maker.get_no_of_terrain_vertex_arrays());
+        diamond_square_vertex_buffers.at(i).resize(world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays());
     }
 
 
-    GLuint diamond_square_colour_buffers[world_maker.get_no_of_terrain_vertex_arrays()];
+    GLuint diamond_square_colour_buffers[world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays()];
     GLuint tree_vertex_buffer[world_maker.get_num_l_systems()];
     GLuint tree_position_vertex_buffer[world_maker.get_num_l_systems()];
 
@@ -131,6 +133,7 @@ int OpenGLMagic() {
 
 // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 // Use terrain shader
         glUseProgram(terrain_shaders);
@@ -151,7 +154,7 @@ int OpenGLMagic() {
 
 
         glUniformMatrix4fv(terrain_shaders_uniform_id, 1, GL_FALSE, &MVP[0][0]);
-        for (int i = 0; i < world_maker.get_no_of_terrain_vertex_arrays(); i++) {
+        for (int i = 0; i < world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays(); i++) {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
@@ -212,9 +215,9 @@ int OpenGLMagic() {
             glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
             glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
 
-//
-//            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
-//                                  world_maker.get_num_trees_()[i]);
+
+            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
+                                  world_maker.get_num_trees_()[i]);
         }
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -231,7 +234,7 @@ int OpenGLMagic() {
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
-    for (int i = 0; i < world_maker.get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays(); i++) {
         glDeleteBuffers(1, &diamond_square_vertex_buffers[world_maker.get_terrain_size()][i]);
         glDeleteBuffers(1, &diamond_square_colour_buffers[i]);
     }

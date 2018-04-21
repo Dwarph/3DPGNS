@@ -40,13 +40,11 @@ if (INCLUDE_DISTRIB)
 endif (INCLUDE_DISTRIB)
 
 include_directories(
-        external/AntTweakBar-1.16/include/
+
         external/glfw-3.1.2/include/GLFW/
         external/glm-0.9.7.1/
         external/glew-1.13.0/include/
-        external/assimp-3.0.1270/include/
-        external/bullet-2.81-rev2613/src/
-        .
+        external/nanogui/include/nanogui
 )
 find_package(Boost 1.62 REQUIRED COMPONENTS unit_test_framework)
 
@@ -54,6 +52,7 @@ set(ALL_LIBS
         ${OPENGL_LIBRARY}
         glfw
         GLEW_1130
+        nanogui
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
@@ -78,7 +77,6 @@ add_executable(3DPGNS
         world_maker.h
 
         Tests/test_diamond_square.cpp
-        Tests/test_diamond_square.h
 
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp
@@ -87,15 +85,37 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/controls.hpp
 
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
-        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader world_maker.cpp world_maker.h
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader)
+
+add_executable(TESTING
+        Tests/test_diamond_square.cpp
+
+        diamond_square.cpp
+        diamond_square.h
+        l_system.cpp
+        l_system.h
+
+        world_maker.cpp
+        world_maker.h
 
         Tests/test_diamond_square.cpp
-        Tests/test_diamond_square.h)
+
+        external/OpenGLTutorialUsefulFiles/shader.cpp
+        external/OpenGLTutorialUsefulFiles/shader.hpp
+
+        external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader
+        )
 
 
 target_link_libraries(3DPGNS
         ${ALL_LIBS}
         )
+
+target_link_libraries(TESTING
+        ${ALL_LIBS}
+        )
+
 
 set_target_properties(3DPGNS PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")
 create_target_launcher(3DPGNS WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/3DPGNS/")

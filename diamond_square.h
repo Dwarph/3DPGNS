@@ -22,17 +22,11 @@ class DiamondSquare {
 
 public:
 
-    DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays, int no_of_iterations);
+    DiamondSquare(int rough_max, int no_of_iterations);
 
     vector<vector<vector<float>>> get_height_map();
 
-    void GenerateHeightMap();
-
-    void GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain_verts, float scale);
-
     float get_height(int grid_num, int x, int z);
-
-    int RandInRange(int range, bool negative);
 
     int get_max_size() const;
 
@@ -43,6 +37,14 @@ public:
     float get_min_height() const;
 
     int get_no_of_iterations();
+
+    int get_no_of_terrain_vertex_arrays() const;
+
+    void GenerateHeightMap();
+
+    void GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain_verts, float scale);
+
+    int RandInRange(int range, bool negative);
 
     void ResizeVector2(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
 
@@ -65,7 +67,6 @@ private :
     void DiamondStep(int grid_num, int x, int z, int step, float offset);
 
     void SquareStep(int grid_num, int x, int z, int step, float offset);
-
 
     void set_vert_at_point(vector<GLfloat> &verts, int *index, int grid_num, int x, int z, float scale);
 

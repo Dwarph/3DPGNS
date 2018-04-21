@@ -18,8 +18,7 @@
  */
 
 WorldMaker::WorldMaker(int terrain_size, float scale) : terrain_size_(terrain_size), terrain_scale_(scale) {
-    int max = (pow(2, terrain_size)) + 1;
-    this->diamond_square_ = new DiamondSquare(max, 10, get_no_of_terrain_vertex_arrays(), terrain_size);
+    this->diamond_square_ = new DiamondSquare(10, terrain_size);
     this->num_l_systems_ = {0, 0, 0};
     this->trees_;
     this->diamond_square_->ResizeVector2(this->tree_positions_, 3, 0);
@@ -68,17 +67,7 @@ vector<int> WorldMaker::get_num_trees_() const {
     return num_l_systems_;
 }
 
-/**
- * Returns the number of terrain_vertex_arrays
- * @return
- */
-int WorldMaker::get_no_of_terrain_vertex_arrays() {
-    if (terrain_size_ < 7) {
-        return 1;
-    } else {
-        return pow(2, (terrain_size_ - 6));
-    }
-}
+
 
 /**
  * Returns the diamond_square_ terrain object
@@ -180,13 +169,6 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
 void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer) {
     int tree_num = 0;
 
-    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
-    this->tree_positions_.at(tree_num).push_back(
-            diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, 0, 0) *
-            this->terrain_scale_);
-    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
-    this->num_l_systems_.at(tree_num)++;
-
     for (int x = 0; x < diamond_square_->get_max_size(); x++) {
         for (int z = 0; z < diamond_square_->get_max_size(); z++) {
             if (diamond_square_->RandInRange(200, false) == 3) {
@@ -223,14 +205,14 @@ WorldMaker::ComputeDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_
     vector<vector<vector<GLfloat>>> gl_terrain_verts;
     gl_terrain_verts.resize(diamond_square_->get_no_of_iterations());
     for (int i = 0; i < diamond_square_->get_no_of_iterations(); ++i) {
-        gl_terrain_verts.at(i).resize(get_no_of_terrain_vertex_arrays(),
+        gl_terrain_verts.at(i).resize(diamond_square_->get_no_of_terrain_vertex_arrays(),
                                       vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
     }
 
     diamond_square_->GenerateVertices(gl_terrain_verts, this->terrain_scale_);
 
     for (int i = 0; i < diamond_square_->get_no_of_iterations(); ++i) {
-        for (int j = 0; j < get_no_of_terrain_vertex_arrays(); j++) {
+        for (int j = 0; j < diamond_square_->get_no_of_terrain_vertex_arrays(); j++) {
             glGenBuffers(1, &terrain_vertex_buffers[i][j]);
             glBindBuffer(GL_ARRAY_BUFFER, (terrain_vertex_buffers[i][j]));
             glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts[i][j].size() * sizeof(float), &gl_terrain_verts[i][j][0],
@@ -253,7 +235,7 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrai
                                               GLuint *diamond_square_colour_buffers) {
     ColourList colours;
     vector<vector<GLfloat>> g_color_buffer_data;
-    g_color_buffer_data.resize(get_no_of_terrain_vertex_arrays(),
+    g_color_buffer_data.resize(diamond_square_->get_no_of_terrain_vertex_arrays(),
                                vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
 
 //  VertexColourRainbow(g_color_buffer_data);
@@ -261,7 +243,7 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrai
 //  VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
     VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
 
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         glGenBuffers(1, &diamond_square_colour_buffers[i]);
         glBindBuffer(GL_ARRAY_BUFFER, diamond_square_colour_buffers[i]);
         glBufferData(GL_ARRAY_BUFFER, g_color_buffer_data[i].size() * sizeof(float), &g_color_buffer_data[i][0],
@@ -274,7 +256,7 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrai
  * @param g_color_buffer_data
  */
 void WorldMaker::VertexColourRainbow(vector<vector<GLfloat>> &g_color_buffer_data) {
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 0; j < diamond_square_->get_no_of_vertices(); j++) {
             GLfloat col = rand() % (101);
             col /= 100;
@@ -293,7 +275,7 @@ void WorldMaker::VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_d
                                        vector<vector<GLfloat>> &gl_terrain_verts) {
     float height_range = diamond_square_->get_max_height() - diamond_square_->get_min_height();
 
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamond_square_->get_no_of_vertices(); j += 3) {
             g_color_buffer_data[i][j - 1] = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
             g_color_buffer_data[i][j] = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
@@ -313,7 +295,7 @@ WorldMaker::VertexColourReal(vector<vector<GLfloat>> &g_color_buffer_data, vecto
                              ColourList colours) {
     float height = 0;
     float rand_num = 0;
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamond_square_->get_no_of_vertices(); j += 3) {
             int min = 97, max = 103;
 
@@ -372,7 +354,7 @@ void WorldMaker::VertexColourRealBlended(vector<vector<GLfloat>> &g_color_buffer
     GLfloat blended_colour[3];
     float height, rand_num;
 
-    for (int i = 0; i < get_no_of_terrain_vertex_arrays(); i++) {
+    for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamond_square_->get_no_of_vertices(); j += 3) {
             int min = 97, max = 103;
 

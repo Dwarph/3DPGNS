@@ -1,6 +1,7 @@
 //
 // Created by pip on 22/02/18.
 //
+#include <cmath>
 #include "diamond_square.h"
 
 /**
@@ -21,7 +22,7 @@
  * @param int no_of_iterations
  */
 
-DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_arrays, int no_of_iterations) {
+DiamondSquare::DiamondSquare(int rough_max, int no_of_iterations) {
 
     this->no_of_iterations = no_of_iterations;
 
@@ -29,17 +30,23 @@ DiamondSquare::DiamondSquare(int max, int rough_max, int no_of_terrain_vertex_ar
     this->min_height_ = 0;
 
     // sets our width & depth size
-    this->max_size_ = max;
-//    cout << "noofterr: " << no_of_terrain_vertex_arrays << endl;
+    // has to be a multiple of 2
+    // no_of_iterations directly corresponds with the size
+    //so this works!
+    this->max_size_ = (pow(2, no_of_iterations)) + 1;;
 
     //resizes our height_map_ vector appropriately
     height_map_.resize(1);
-    ResizeVector2(height_map_.at(0), max, max);
-//    ResizeVector3(height_map_, this->no_of_iterations, max, max);
-//    height_map_.resize(this->get_no_of_iterations());
+    ResizeVector2(height_map_.at(0), this->max_size_, this->max_size_);
+
 
     //provides us with the number of terrain vertex arrays
-    this->no_of_terrain_vertex_arrays_ = no_of_terrain_vertex_arrays;
+
+    if (no_of_iterations < 7) {
+        this->no_of_terrain_vertex_arrays_ = 1;
+    } else {
+        this->no_of_terrain_vertex_arrays_ = pow(2, (no_of_iterations - 6));
+    }
 
     //calculates the number of vertices of the terrain
     this->no_of_vertices_ =
@@ -137,6 +144,15 @@ float DiamondSquare::get_max_height() const {
  */
 float DiamondSquare::get_min_height() const {
     return min_height_;
+}
+
+/**
+ * Returns the number of terrain_vertex_arrays
+ * @return
+ */
+
+int DiamondSquare::get_no_of_terrain_vertex_arrays() const {
+    return no_of_terrain_vertex_arrays_;
 }
 
 /**
@@ -344,7 +360,7 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
             }
         }
     }
-    //ensure the max and min heights adhere to the scale
+    //ensure the max and min heighpip_is_coolts adhere to the scale
     this->max_height_ *= scale;
     this->min_height_ *= scale;
 
@@ -449,3 +465,5 @@ void DiamondSquare::ResizeVector3(std::vector<std::vector<std::vector<float> > >
     }
 
 }
+
+

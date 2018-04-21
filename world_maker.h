@@ -33,8 +33,6 @@ public:
                    GLuint *tree_vertex_buffer,
                    GLuint *tree_position_vertex_buffer);
 
-    int get_no_of_terrain_vertex_arrays();
-
     int get_terrain_size() const;
 
     vector<int> get_num_trees_() const;
