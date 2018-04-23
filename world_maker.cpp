@@ -168,12 +168,13 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
  */
 void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer) {
     int tree_num = 0;
+    int num_l_systems_size = this->num_l_systems_.size();
 
     for (int x = 0; x < diamond_square_->get_max_size(); x++) {
         for (int z = 0; z < diamond_square_->get_max_size(); z++) {
             if (diamond_square_->RandInRange(200, false) == 3) {
 
-                tree_num = diamond_square_->RandInRange(this->num_l_systems_.size(), false) - 1;
+                tree_num = diamond_square_->RandInRange(num_l_systems_size, false) - 1;
                 this->tree_positions_.at(tree_num).push_back(x * this->terrain_scale_);
                 this->tree_positions_.at(tree_num).push_back(
                         diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, x, z) *
@@ -184,7 +185,7 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
         }
     }
 
-    for (int i = 0; i < num_l_systems_.size(); ++i) {
+    for (int i = 0; i < num_l_systems_size; ++i) {
 
         glGenBuffers(1, &tree_position_vertex_buffer[i]);
         glBindBuffer(GL_ARRAY_BUFFER, tree_position_vertex_buffer[i]);
@@ -239,7 +240,7 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrai
                                vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
 
 //  VertexColourRainbow(g_color_buffer_data);
-//  VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts, height_range);
+//  VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts);
 //  VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
     VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
 

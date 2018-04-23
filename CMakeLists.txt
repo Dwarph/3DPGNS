@@ -76,8 +76,6 @@ add_executable(3DPGNS
         world_maker.cpp
         world_maker.h
 
-        Tests/test_diamond_square.cpp
-
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp
 

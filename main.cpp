@@ -41,7 +41,8 @@ int WindowSetup() {
     window = glfwCreateWindow(1024, 768, "3DPGNS", NULL, NULL);
     if (window == NULL) {
         fprintf(stderr,
-                "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
+                "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. "
+                "Try the 2.1 version of the tutorials.\n");
         getchar();
         glfwTerminate();
         return -1;
@@ -76,7 +77,6 @@ int WindowSetup() {
 
     // Cull triangles which normal is not towards the camera
     glEnable(GL_CULL_FACE);
-//    glCullFace(GL_FRONT);
 }
 
 
@@ -107,7 +107,7 @@ int OpenGLMagic() {
     // Get a handle for our l_system shaders uniform
     GLint l_system_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
 
-    WorldMaker world_maker = WorldMaker(9, 5);
+    WorldMaker world_maker = WorldMaker(9, 1);
 
 
     /** Bind vertices to buffer**/
@@ -158,26 +158,26 @@ int OpenGLMagic() {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[world_maker.get_terrain_size() - 1][i]);
+            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[5][i]);
             glVertexAttribPointer(
-                    0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-                    3,                  // size
-                    GL_FLOAT,           // type
-                    GL_FALSE,           // normalized?
-                    0,                  // stride
-                    (void *) 0            // array buffer offset
+                    0,               // attribute. No particular reason for 0, but must match the layout in the shader.
+                    3,               // size
+                    GL_FLOAT,        // type
+                    GL_FALSE,        // normalized?
+                    0,               // stride
+                    (void *) 0       // array buffer offset
             );
 
             // 2nd attribute buffer : colors
             glEnableVertexAttribArray(1);
             glBindBuffer(GL_ARRAY_BUFFER, diamond_square_colour_buffers[i]);
             glVertexAttribPointer(
-                    1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-                    3,                                // size
-                    GL_FLOAT,                         // type
-                    GL_FALSE,                         // normalized?
-                    0,                                // stride
-                    (void *) 0                          // array buffer offset
+                    1,               // attribute. No particular reason for 1, but must match the layout in the shader.
+                    3,               // size
+                    GL_FLOAT,        // type
+                    GL_FALSE,        // normalized?
+                    0,               // stride
+                    (void *) 0       // array buffer offset
             );
 
             // Draw the Terrain !
@@ -193,22 +193,22 @@ int OpenGLMagic() {
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, tree_vertex_buffer[i]);
             glVertexAttribPointer(
-                    0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-                    3,                  // size
-                    GL_FLOAT,           // type
-                    GL_FALSE,           // normalized?
-                    0,                  // stride
-                    (void *) 0            // array buffer offset
+                    0,               // attribute. No particular reason for 0, but must match the layout in the shader.
+                    3,               // size
+                    GL_FLOAT,        // type
+                    GL_FALSE,        // normalized?
+                    0,               // stride
+                    (void *) 0       // array buffer offset
             );
             glEnableVertexAttribArray(1);
             glBindBuffer(GL_ARRAY_BUFFER, tree_position_vertex_buffer[i]);
             glVertexAttribPointer(
-                    1,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-                    3,                  // size
-                    GL_FLOAT,           // type
-                    GL_FALSE,           // normalized?
-                    0,                  // stride
-                    (void *) 0            // array buffer offset
+                    1,               // attribute. No particular reason for 0, but must match the layout in the shader.
+                    3,               // size
+                    GL_FLOAT,        // type
+                    GL_FALSE,        // normalized?
+                    0,               // stride
+                    (void *) 0       // array buffer offset
             );
             glEnableVertexAttribArray(2);
 
@@ -243,8 +243,6 @@ int OpenGLMagic() {
         glDeleteBuffers(1, &tree_vertex_buffer[i]);
         glDeleteBuffers(1, &tree_position_vertex_buffer[i]);
     }
-
-
 
     glDeleteProgram(terrain_shaders);
     glDeleteProgram(l_system_shaders);

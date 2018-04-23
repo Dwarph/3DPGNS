@@ -2,6 +2,7 @@
 // Created by pip on 22/02/18.
 //
 #include <cmath>
+#include <algorithm>
 #include "diamond_square.h"
 
 /**
@@ -173,11 +174,14 @@ vector<vector<vector<float>>> DiamondSquare::get_height_map() {
  */
 void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale) {
     if (this->get_height(grid_num, x, z) != 0) {
-        vertices[*index] = x * scale;
+        float x_value = (x / vertices.size()) * this->max_size_;
+        float z_value = (z / vertices.size()) * this->max_size_;
+
+        vertices[*index] = x_value * scale;
         (*index)++;
         vertices[*index] = this->get_height(grid_num, x, z) * scale;
         (*index)++;
-        vertices[*index] = z * scale;
+        vertices[*index] = z_value * scale;
         (*index)++;
     }
 }
@@ -242,22 +246,50 @@ void DiamondSquare::GenerateHeightMap() {
         if (iterations != this->no_of_iterations) {
             this->height_map_.push_back(this->height_map_.at(iterations - 1));
         }
+
     }
     cout << "ITERATIONS:" << iterations << endl;
 
-    //This brings all the values down to where the camera initially begins
+
     float heightOffset = height_map_[height_map_.size() - 1][0][0];
-    for (int z = 0; z < max_size_; z++) {
-        for (int x = 0; x < max_size_; x++) {
-            height_map_[this->get_no_of_iterations() - 1][z][x] -= heightOffset - 1;
-            if (height_map_[this->get_no_of_iterations() - 1][z][x] < this->min_height_) {
-                this->min_height_ = height_map_[this->get_no_of_iterations() - 1][z][x];
+
+
+    auto removeZeros = [&](float number) -> bool {
+        return number == 0;
+    };
+
+
+    auto removeEmpty = [&](vector<float> vec) -> bool {
+        return vec.size() == 0;
+    };
+
+
+    //This brings all the values down to where the camera initially begins
+    //It also gets rid of zero values in early iterations
+    for (int itr = 0; itr < height_map_.size(); itr++) {
+        int z_size = height_map_.at(itr).size();
+        for (int z = 0; z < z_size; z++) {
+
+            auto iterator_x = remove_if(height_map_[itr][z].begin(), height_map_[itr][z].end(), removeZeros);
+            height_map_[itr][z].erase(iterator_x, height_map_[itr][z].end());
+
+            int x_size = height_map_[itr][z].size();
+            for (int x = 0; x < x_size; x++) {
+                height_map_[itr][z][x] -= heightOffset - 1;
+
+                if (height_map_[itr][z][x] < this->min_height_) {
+                    this->min_height_ = height_map_[itr][z][x];
+                } else if (height_map_[itr][z][x] > this->max_height_) {
+                    this->max_height_ = height_map_[itr][z][x];
+                }
             }
-            if (height_map_[this->get_no_of_iterations() - 1][z][x] > this->max_height_) {
-                this->max_height_ = height_map_[this->get_no_of_iterations() - 1][z][x];
-            }
+
+
         }
+        auto iterator_z = remove_if(height_map_[itr].begin(), height_map_[itr].end(), removeEmpty);
+        height_map_[itr].erase(iterator_z, height_map_[itr].end());
     }
+    rand();
 }
 
 //    this->PrintGrid(this->get_no_of_iterations() - 1, "GRID", false);
@@ -314,15 +346,17 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
     //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
     int count = 0;
 
-
     //iterates over the depth (z) and the width (x)
     //then iterates 3 times for each vertice in a triangle
     //and 2 times for 2 triangles per square
     for (int itr = 0; itr < no_of_iterations; itr++) {
         count = 0;
         index = 0;
-        for (int z = 0; z < this->max_size_ - 1; z++) {
-            for (int x = 0; x < this->max_size_ - 1; x++) {
+
+        int size = get_height_map().at(itr).size() - 1;
+
+        for (int z = 0; z < size; z++) {
+            for (int x = 0; x < size; x++) {
                 for (int j = 0; j < 2; j++) {
                     for (int i = 0; i < 3; i++) {
                         if (index >= this->no_of_vertices_) {
