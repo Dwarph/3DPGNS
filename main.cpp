@@ -158,7 +158,7 @@ int OpenGLMagic() {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[world_maker.get_terrain_size() - 1][i]);
+            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[4][i]);
             glVertexAttribPointer(
                     0,               // attribute. No particular reason for 0, but must match the layout in the shader.
                     3,               // size

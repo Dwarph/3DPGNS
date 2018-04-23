@@ -83,7 +83,7 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/controls.hpp
 
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
-        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader)
+        external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader terrain_quad_tree.cpp terrain_quad_tree.h)
 
 add_executable(TESTING
         Tests/test_diamond_square.cpp
@@ -103,7 +103,7 @@ add_executable(TESTING
 
         external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader
         external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader
-        )
+        terrain_quad_tree.cpp terrain_quad_tree.h)
 
 
 target_link_libraries(3DPGNS
