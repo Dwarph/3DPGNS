@@ -68,7 +68,8 @@ private :
 
     void SquareStep(int grid_num, int x, int z, int step, float offset);
 
-    void set_vert_at_point(vector<GLfloat> &verts, int *index, int grid_num, int x, int z, float scale);
+    void
+    set_vert_at_point(vector<GLfloat> &verts, int *index, int grid_num, int x, int z, float scale, int height_map_size);
 
     void PrintGrid(int grid_num, string initial, bool show_zero);
 

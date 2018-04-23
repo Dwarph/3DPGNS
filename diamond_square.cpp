@@ -172,10 +172,11 @@ vector<vector<vector<float>>> DiamondSquare::get_height_map() {
  * @param z
  * @param scale
  */
-void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale) {
+void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int grid_num, int x, int z, float scale,
+                                      int height_map_size) {
     if (this->get_height(grid_num, x, z) != 0) {
-        float x_value = (x / vertices.size()) * this->max_size_;
-        float z_value = (z / vertices.size()) * this->max_size_;
+        float x_value = ((float) x / (float) height_map_size) * this->max_size_;
+        float z_value = ((float) z / (float) height_map_size) * this->max_size_;
 
         vertices[*index] = x_value * scale;
         (*index)++;
@@ -367,25 +368,26 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
                         switch (i) {
                             case 0:
                                 if (j == 0) {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z, scale, size);
                                 } else {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale, size);
                                 }
                                 break;
 
                             case 1:
                                 if (j == 0) {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale, size);
                                 } else {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x, z + 1, scale, size);
                                 }
                                 break;
 
                             case 2:
                                 if (j == 0) {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z, scale, size);
                                 } else {
-                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z + 1, scale);
+                                    set_vert_at_point(gl_terrain_verts[itr][count], &index, itr, x + 1, z + 1, scale,
+                                                      size);
                                 }
                                 break;
                         }
