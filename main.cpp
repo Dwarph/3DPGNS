@@ -107,7 +107,7 @@ int OpenGLMagic() {
     // Get a handle for our l_system shaders uniform
     GLint l_system_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
 
-    WorldMaker world_maker = WorldMaker(9, 5);
+    WorldMaker world_maker = WorldMaker(9, 1);
 
 
     /** Bind vertices to buffer**/
@@ -158,7 +158,7 @@ int OpenGLMagic() {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[4][i]);
+            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[3][i]);
             glVertexAttribPointer(
                     0,               // attribute. No particular reason for 0, but must match the layout in the shader.
                     3,               // size

@@ -176,7 +176,7 @@ void DiamondSquare::set_vert_at_point(vector<GLfloat> &vertices, int *index, int
                                       int height_map_size) {
     if (this->get_height(grid_num, x, z) != 0) {
 
-        //scales height_map vertex points to the appropriate size
+        //scales height_map vertex points to the appropriate size (for LOD)
         float x_value = ((float) x / (float) height_map_size) * this->max_size_;
         float z_value = ((float) z / (float) height_map_size) * this->max_size_;
 

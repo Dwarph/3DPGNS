@@ -23,7 +23,6 @@ glm::mat4 getProjectionMatrix() {
     return ProjectionMatrix;
 }
 
-
 // Initial position : on +Z
 glm::vec3 position = glm::vec3(0, 5, 0);
 // Initial horizontal angle : toward -Z
@@ -36,6 +35,10 @@ float initialFoV = 45.0f;
 float speed = 200.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 
+
+glm::vec3 get_position() {
+    return position;
+}
 
 void computeMatricesFromInputs() {
 
@@ -106,6 +109,8 @@ void computeMatricesFromInputs() {
 
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
+
+//    std::cout << "{ " << position.x << ", " << position.y << ", " << position.z << "}" << std::endl;
 
 //    std::cout << "horizon: " << horizontalAngle << ", verticalAngle: " << verticalAngle << std::endl;
 }
