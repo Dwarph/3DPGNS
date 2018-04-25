@@ -6,10 +6,10 @@
 #define INC_3DPGNS_TERRAIN_QUAD_TREE_H
 
 
-#include <GL/gl.h>
 #include <vector>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+#include <GL/glew.h>
 
 
 struct Node {
@@ -23,16 +23,12 @@ struct Node {
     bool is_leaf = true;
 };
 
-class terrain_quad_tree {
+class TerrainQuadTree {
 
 public:
 
-    terrain_quad_tree(int no_of_iterations);
+    TerrainQuadTree(int no_of_iterations);
 
-private:
-
-    Node root;
-    int no_of_iterations;
 
     void GenerateQuadTree(glm::vec3 position, std::vector<std::vector<std::vector<GLfloat>>> &height_map,
                           std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts);
@@ -40,6 +36,12 @@ private:
     void GenerateHeightMap(std::vector<GLfloat> &vertices,
                            std::vector<std::vector<std::vector<GLfloat>>> &height_map,
                            std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts);
+
+private:
+
+    Node root;
+    int no_of_iterations;
+
 
     void AssignVertices(Node *node, std::vector<GLfloat> &vertices,
                         std::vector<std::vector<std::vector<GLfloat>>> &height_map,

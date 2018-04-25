@@ -105,7 +105,7 @@ void WorldMaker::MakeWorld(vector<vector<GLuint >> &terrain_vertex_buffers,
                            GLuint *diamond_square_colour_buffers,
                            GLuint *tree_vertex_buffer,
                            GLuint *tree_position_vertex_buffer) {
-    ComputeDiamondSquareBuffers(terrain_vertex_buffers, diamond_square_colour_buffers);
+    ComputeFullDiamondSquareBuffers(terrain_vertex_buffers, diamond_square_colour_buffers);
     ComputeLSystemVertexBuffer(tree_vertex_buffer);
     GenerateTreePositionBuffer(tree_position_vertex_buffer);
 }
@@ -194,16 +194,33 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
     }
 }
 
+void WorldMaker::ComputeDiamondSquareLOD(GLuint &terrain_vertex_buffer, GLuint *diamond_square_colour_buffers,
+                                         glm::vec3 position) {
+
+    std::vector<GLfloat> gl_terrain_verts_lod;
+    TerrainQuadTree terrainQuadTree = TerrainQuadTree(4);
+    std::vector<std::vector<std::vector<float>>> height_map = diamond_square_->get_height_map();
+
+    terrainQuadTree.GenerateQuadTree(position, height_map, gl_terrain_verts);
+    terrainQuadTree.GenerateHeightMap(gl_terrain_verts_lod, height_map, gl_terrain_verts);
+
+    glGenBuffers(1, &terrain_vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, (terrain_vertex_buffer));
+    glBufferData(GL_ARRAY_BUFFER, gl_terrain_verts_lod.size() * sizeof(float), &gl_terrain_verts_lod[0],
+                 GL_STATIC_DRAW);
+
+}
+
+
 /**
  * Works out the Diamond Square Vertex buffers
  * @param terrain_vertex_buffers
  * @param diamond_square_colour_buffers
  */
 void
-WorldMaker::ComputeDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers,
-                                        GLuint *diamond_square_colour_buffers) {
+WorldMaker::ComputeFullDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers,
+                                            GLuint *diamond_square_colour_buffers) {
 
-    vector<vector<vector<GLfloat>>> gl_terrain_verts;
     gl_terrain_verts.resize(diamond_square_->get_no_of_iterations());
     for (int i = 0; i < diamond_square_->get_no_of_iterations(); ++i) {
         gl_terrain_verts.at(i).resize(diamond_square_->get_no_of_terrain_vertex_arrays(),

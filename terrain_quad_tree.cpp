@@ -2,14 +2,15 @@
 // Created by pip on 23/04/18.
 //
 
+#include <iostream>
 #include "terrain_quad_tree.h"
 
-terrain_quad_tree::terrain_quad_tree(int no_of_iterations) : no_of_iterations(no_of_iterations) {}
+TerrainQuadTree::TerrainQuadTree(int no_of_iterations) : no_of_iterations(no_of_iterations) {}
 
 
-void terrain_quad_tree::GenerateQuadTree(glm::vec3 camera_position,
-                                         std::vector<std::vector<std::vector<GLfloat>>> &height_map,
-                                         std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
+void TerrainQuadTree::GenerateQuadTree(glm::vec3 camera_position,
+                                       std::vector<std::vector<std::vector<GLfloat>>> &height_map,
+                                       std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
 
     int final_size = height_map.back().size();
     float max_length = height_map.back().back().back();
@@ -46,9 +47,9 @@ void terrain_quad_tree::GenerateQuadTree(glm::vec3 camera_position,
     }
 }
 
-void terrain_quad_tree::GenerateHeightMap(std::vector<GLfloat> &vertices,
-                                          std::vector<std::vector<std::vector<GLfloat>>> &height_map,
-                                          std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
+void TerrainQuadTree::GenerateHeightMap(std::vector<GLfloat> &vertices,
+                                        std::vector<std::vector<std::vector<GLfloat>>> &height_map,
+                                        std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
 
 
     Node *current_node = &root;
@@ -57,9 +58,9 @@ void terrain_quad_tree::GenerateHeightMap(std::vector<GLfloat> &vertices,
 
 }
 
-void terrain_quad_tree::AssignVertices(Node *node, std::vector<GLfloat> &vertices,
-                                       std::vector<std::vector<std::vector<GLfloat>>> &height_map,
-                                       std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
+void TerrainQuadTree::AssignVertices(Node *node, std::vector<GLfloat> &vertices,
+                                     std::vector<std::vector<std::vector<GLfloat>>> &height_map,
+                                     std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
     float max_length = height_map.back().back().back();
 
     if (node->is_leaf) {
@@ -81,36 +82,40 @@ void terrain_quad_tree::AssignVertices(Node *node, std::vector<GLfloat> &vertice
         }
         return;
     } else {
-
+        AssignVertices(node->bottom_left, vertices, height_map, gl_terrain_verts);
+        AssignVertices(node->bottom_right, vertices, height_map, gl_terrain_verts);
+        AssignVertices(node->top_left, vertices, height_map, gl_terrain_verts);
+        AssignVertices(node->top_right, vertices, height_map, gl_terrain_verts);
     }
 }
 
-void terrain_quad_tree::PushVertices(Node *node, std::vector<GLfloat> &vertices,
-                                     std::vector<std::vector<GLfloat>> &height_map,
-                                     std::vector<std::vector<GLfloat>> &gl_terrain_verts) {
+void TerrainQuadTree::PushVertices(Node *node, std::vector<GLfloat> &vertices,
+                                   std::vector<std::vector<GLfloat>> &height_map,
+                                   std::vector<std::vector<GLfloat>> &gl_terrain_verts) {
     int lod_size = (height_map.size() - 1) / 3;
     int row_size = lod_size * 3;
 
-    for (int z = node->boundary_bottom_left.y * lod_size; z < node->boundary_top_right.y * lod_size;) {
-        for (int x = node->boundary_bottom_left.x * lod_size; x < node->boundary_top_right.x * lod_size;) {
+    for (int z = node->boundary_bottom_left.y * lod_size; z < node->boundary_top_right.y * lod_size; z++) {
+        for (int x = node->boundary_bottom_left.x * lod_size; x < node->boundary_top_right.x * lod_size; x++) {
             vertices.push_back(gl_terrain_verts.data()->at((z * row_size + (x + 1) * 3)));
         }
     }
 }
 
-bool terrain_quad_tree::IsInNode(Node *node, float step_size, glm::vec3 camera_position) {
+bool TerrainQuadTree::IsInNode(Node *node, float step_size, glm::vec3 camera_position) {
+
     return (camera_position.x < node->boundary_top_right.x
-            && camera_position.x > node->boundary_top_right.x - step_size
+            && camera_position.x >= node->boundary_top_right.x - step_size
             && camera_position.z < node->boundary_top_right.y
-            && camera_position.z < node->boundary_top_right.y - step_size);
+            && camera_position.z >= node->boundary_top_right.y - step_size);
 }
 
-void terrain_quad_tree::SplitNode(Node *node, float step_size, int iteration) {
+void TerrainQuadTree::SplitNode(Node *node, float step_size, int iteration) {
 
     node->is_leaf = false;
 
     /*Define bottom left node boundaries*/
-
+    node->bottom_left = new Node;
     node->bottom_left->level_of_detail = iteration;
     node->bottom_left->boundary_bottom_left = node->boundary_bottom_left;
     node->bottom_left->boundary_top_right = glm::vec2(node->boundary_bottom_left.x + step_size,
@@ -118,6 +123,8 @@ void terrain_quad_tree::SplitNode(Node *node, float step_size, int iteration) {
 
     /*Define bottom right node boundaries*/
 
+
+    node->bottom_right = new Node;
     node->bottom_right->level_of_detail = iteration;
     node->bottom_right->boundary_bottom_left = glm::vec2(node->boundary_bottom_left.x + step_size,
                                                          node->boundary_bottom_left.y);
@@ -126,6 +133,7 @@ void terrain_quad_tree::SplitNode(Node *node, float step_size, int iteration) {
 
     /*Define top left node boundaries*/
 
+    node->top_left = new Node;
     node->top_left->level_of_detail = iteration;
     node->top_left->boundary_bottom_left = glm::vec2(node->boundary_bottom_left.x,
                                                      node->boundary_bottom_left.y + step_size);
@@ -134,6 +142,7 @@ void terrain_quad_tree::SplitNode(Node *node, float step_size, int iteration) {
 
     /*Define top right node boundaries*/
 
+    node->top_right = new Node;
     node->top_right->level_of_detail = iteration;
     node->top_right->boundary_bottom_left = glm::vec2(node->boundary_top_right.x - step_size,
                                                       node->boundary_top_right.y - step_size);

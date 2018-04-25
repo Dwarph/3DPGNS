@@ -10,6 +10,7 @@
 
 #include "./diamond_square.h"
 #include "./l_system.h"
+#include "terrain_quad_tree.h"
 
 
 struct ColourList {
@@ -33,6 +34,9 @@ public:
                    GLuint *tree_vertex_buffer,
                    GLuint *tree_position_vertex_buffer);
 
+    void
+    ComputeDiamondSquareLOD(GLuint &terrain_vertex_buffer, GLuint *diamond_square_colour_buffers, glm::vec3 position);
+
     int get_terrain_size() const;
 
     vector<int> get_num_trees_() const;
@@ -54,10 +58,13 @@ private:
     std::vector<LSystem> trees_;
     std::vector<int> num_l_systems_;
     std::vector<vector<GLfloat>> tree_positions_;
+    vector<vector<vector<GLfloat>>> gl_terrain_verts;
+
 
 
     void
-    ComputeDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers, GLuint *diamond_square_colour_buffers);
+    ComputeFullDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers,
+                                    GLuint *diamond_square_colour_buffers);
 
     void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrain_verts,
                                            GLuint *diamond_square_colour_buffers);
