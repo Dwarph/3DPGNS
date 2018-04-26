@@ -76,7 +76,7 @@ int WindowSetup() {
     glDepthMask(GL_TRUE);
 
     // Cull triangles which normal is not towards the camera
-//    glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 }
 
 
@@ -130,10 +130,10 @@ int OpenGLMagic() {
                           tree_vertex_buffer,
                           tree_position_vertex_buffer);
 
-    world_maker.ComputeDiamondSquareLOD(diamond_square_vertex_buffers_LOD, diamond_square_colour_buffers,
-                                        get_position());
+
     /** Main Draw Loop **/
     do {
+
 
 // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -150,6 +150,7 @@ int OpenGLMagic() {
         mat4 ModelMatrix = glm::mat4(1.0);
         mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
+
 /** Terrain display commands**/
 // Send our transformation to the currently bound shader,
 // in the "MVP" uniform
@@ -162,7 +163,7 @@ int OpenGLMagic() {
 
             // Attribute buffer - vertices
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers_LOD);
+            glBindBuffer(GL_ARRAY_BUFFER, diamond_square_vertex_buffers[8][i]);
             glVertexAttribPointer(
                     0,               // attribute. No particular reason for 0, but must match the layout in the shader.
                     3,               // size

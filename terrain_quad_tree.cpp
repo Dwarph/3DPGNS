@@ -2,7 +2,6 @@
 // Created by pip on 23/04/18.
 //
 
-#include <iostream>
 #include "terrain_quad_tree.h"
 
 TerrainQuadTree::TerrainQuadTree(int no_of_iterations) : no_of_iterations(no_of_iterations) {}
@@ -66,14 +65,14 @@ void TerrainQuadTree::AssignVertices(Node *node, std::vector<GLfloat> &vertices,
     if (node->is_leaf) {
         switch (node->level_of_detail) {
             case 0:
-                PushVertices(node, vertices, height_map.at(3), gl_terrain_verts.at(3));
+                PushVertices(node, vertices, height_map.at(3), gl_terrain_verts.at(height_map.size() - 1));
                 break;
             case 1:
-                PushVertices(node, vertices, height_map.at(height_map.size() - 3),
+                PushVertices(node, vertices, height_map.at(height_map.size() - 1),
                              gl_terrain_verts.at(height_map.size() - 3));
                 break;
             case 2:
-                PushVertices(node, vertices, height_map.at(height_map.size() - 2),
+                PushVertices(node, vertices, height_map.at(height_map.size() - 1),
                              gl_terrain_verts.at(height_map.size() - 2));
                 break;
             case 3:
@@ -89,15 +88,75 @@ void TerrainQuadTree::AssignVertices(Node *node, std::vector<GLfloat> &vertices,
     }
 }
 
+void set_vert_at_point(std::vector<GLfloat> &vertices, std::vector<std::vector<GLfloat>> &height_map,
+                       int x, int z, float scale, int height_map_size, int max_size) {
+
+    //scales height_map vertex points to the appropriate size (for LOD)
+    float x_value = ((float) x / (float) height_map_size) * max_size;
+    float z_value = ((float) z / (float) height_map_size) * max_size;
+
+
+    vertices.push_back(x_value * scale);
+    vertices.push_back(height_map.at(x).at(z) * scale);
+    vertices.push_back(z_value * scale);
+
+}
+
 void TerrainQuadTree::PushVertices(Node *node, std::vector<GLfloat> &vertices,
                                    std::vector<std::vector<GLfloat>> &height_map,
                                    std::vector<std::vector<GLfloat>> &gl_terrain_verts) {
-    int lod_size = (height_map.size() - 1) / 3;
-    int row_size = lod_size * 3;
+    int lod_size = height_map.size();
+    int vertex_buffer_size = gl_terrain_verts.at(0).size();
 
-    for (int z = node->boundary_bottom_left.y * lod_size; z < node->boundary_top_right.y * lod_size; z++) {
-        for (int x = node->boundary_bottom_left.x * lod_size; x < node->boundary_top_right.x * lod_size; x++) {
-            vertices.push_back(gl_terrain_verts.data()->at((z * row_size + (x + 1) * 3)));
+    float scale = 50;
+    for (int z = node->boundary_bottom_left.y * lod_size; z < (node->boundary_top_right.y * lod_size) - 1; z++) {
+        for (int x = node->boundary_bottom_left.x * lod_size; x < (node->boundary_top_right.x * lod_size) - 1; x++) {
+
+//            std::cout << "{ x: " << x;
+//            std::cout << ", y: " << height_map.at(x).at(z);
+//            std::cout << ", z: " << z << "}" << std::endl;
+
+            for (int j = 0; j < 2; j++) {
+                for (int i = 0; i < 3; i++) {
+//                    std::cout << "z: " << z << ", x: " << x << ", i:" << i << ", j:" << j << std::endl;
+                    if (z == 0 && x == 16 && i == 2 && j == 0) {
+                        rand();
+                    }
+                    switch (i) {
+                        case 0:
+                            if (j == 0) {
+                                set_vert_at_point(vertices, height_map, x, z, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+                            } else {
+                                set_vert_at_point(vertices, height_map, x + 1, z, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+                            }
+                            break;
+
+                        case 1:
+                            if (j == 0) {
+                                set_vert_at_point(vertices, height_map, x, z + 1, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+
+                            } else {
+                                set_vert_at_point(vertices, height_map, x, z + 1, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+                            }
+                            break;
+
+                        case 2:
+                            if (j == 0) {
+                                set_vert_at_point(vertices, height_map, x + 1, z, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+                            } else {
+                                set_vert_at_point(vertices, height_map, x + 1, z + 1, scale, height_map.size(),
+                                                  height_map.at(height_map.size() - 1).size());
+
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 }
