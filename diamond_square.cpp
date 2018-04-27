@@ -280,10 +280,12 @@ void DiamondSquare::GenerateHeightMap() {
             for (int x = 0; x < x_size; x++) {
                 height_map_[itr][z][x] -= heightOffset - 1;
 
-                if (height_map_[itr][z][x] < this->min_height_) {
-                    this->min_height_ = height_map_[itr][z][x];
-                } else if (height_map_[itr][z][x] > this->max_height_) {
-                    this->max_height_ = height_map_[itr][z][x];
+                if (itr == height_map_.size() - 1) {
+                    if (height_map_[itr][z][x] < this->min_height_) {
+                        this->min_height_ = height_map_[itr][z][x];
+                    } else if (height_map_[itr][z][x] > this->max_height_) {
+                        this->max_height_ = height_map_[itr][z][x];
+                    }
                 }
             }
 

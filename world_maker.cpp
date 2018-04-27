@@ -170,6 +170,13 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
     int tree_num = 0;
     int num_l_systems_size = this->num_l_systems_.size();
 
+    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
+    this->tree_positions_.at(tree_num).push_back(
+            diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, 0, 0) *
+            this->terrain_scale_);
+    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
+    this->num_l_systems_.at(tree_num)++;
+
     for (int x = 0; x < diamond_square_->get_max_size(); x++) {
         for (int z = 0; z < diamond_square_->get_max_size(); z++) {
             if (diamond_square_->RandInRange(200, false) == 3) {

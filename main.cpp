@@ -107,7 +107,7 @@ int OpenGLMagic() {
     // Get a handle for our l_system shaders uniform
     GLint l_system_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
 
-    WorldMaker world_maker = WorldMaker(9, 1);
+    WorldMaker world_maker = WorldMaker(9, 10);
 
 
     /** Bind vertices to buffer**/
@@ -221,8 +221,8 @@ int OpenGLMagic() {
             glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
 
 
-//            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
-//                                  world_maker.get_num_trees_()[i]);
+            glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
+                                  world_maker.get_num_trees_()[i]);
         }
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
