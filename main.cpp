@@ -273,8 +273,14 @@ int OpenGLMagic() {
     // Check if the ESC key was pressed or the window was closed
 
 // Cleanup VBO and shader
+
+    for (int i = 0; i < diamond_square_vertex_buffers.size(); i++) {
+        for (int j = 0; j < diamond_square_vertex_buffers.at(i).size(); j++) {
+            glDeleteBuffers(1, &diamond_square_vertex_buffers[i][j]);
+        }
+
+    }
     for (int i = 0; i < world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays(); i++) {
-        glDeleteBuffers(1, &diamond_square_vertex_buffers[world_maker.get_terrain_size()][i]);
         glDeleteBuffers(1, &diamond_square_colour_buffers[i]);
     }
 
