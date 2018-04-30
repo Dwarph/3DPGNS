@@ -86,7 +86,7 @@ add_executable(3DPGNS
         external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader terrain_quad_tree.cpp terrain_quad_tree.h)
 
 add_executable(TESTING
-        Tests/test_diamond_square.cpp
+        Tests/unit_tests.cpp
 
         diamond_square.cpp
         diamond_square.h
@@ -96,7 +96,7 @@ add_executable(TESTING
         world_maker.cpp
         world_maker.h
 
-        Tests/test_diamond_square.cpp
+        Tests/unit_tests.cpp
 
         external/OpenGLTutorialUsefulFiles/shader.cpp
         external/OpenGLTutorialUsefulFiles/shader.hpp

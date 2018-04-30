@@ -68,7 +68,7 @@ void LSystem::GenerateFractal() {
 
     //could replace "rules_" with a hashmap
 
-    std::string newString = "";
+    std::string new_string = "";
     this->fractal_string_ = this->seed_;
     bool found = false;
 
@@ -76,18 +76,18 @@ void LSystem::GenerateFractal() {
         for (int i = 0; i < this->fractal_string_.length(); i++) {
             for (int j = 0; j < this->rules_.size(); j++) {
                 if (this->fractal_string_[i] == this->rules_[j].axiom) {
-                    newString.append(this->rules_[j].rule);
+                    new_string.append(this->rules_[j].rule);
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                newString += this->fractal_string_[i];
+                new_string += this->fractal_string_[i];
             }
             found = false;
         }
-        fractal_string_ = newString;
-        newString = "";
+        fractal_string_ = new_string;
+        new_string = "";
     }
 }
 
@@ -98,30 +98,18 @@ void LSystem::GenerateVertices() {
 
 
     glm::fvec3 current_position = {0, 0, 0};
-    glm::fvec3 angle = {0, 0, 0};
-    glm::fvec3 x_axis = {0, 1, 1};
-    glm::fvec3 y_axis = {1, 0, 1};
-    glm::fvec3 z_axis = {1, 1, 0};
-    int levelNum = 1;
+    int level_num = 1;
 
-    std::vector<glm::fvec3> positionBuffer;
-    std::vector<glm::fvec3> angleBuffer;
+    std::vector<glm::fvec3> position_buffer;
+    std::vector<glm::fvec3> angle_buffer;
 
-    glm::fmat4 rotation_matrix_z = glm::rotate(angle.z, z_axis);
-
-    glm::fmat4 translation = glm::translate(glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
-
-    int translationOffset = 1;
-    float rotationOffset = this->angle_mod_;
-
-
-    glm::vec3 translationVector = glm::vec3(0, 1, 0);
-    glm::quat rotationX = glm::quat(glm::vec3(rotationOffset, 0, 0));
-    glm::quat negRotationX = glm::quat(glm::vec3(-rotationOffset, 0, 0));
-    glm::quat rotationY = glm::quat(glm::vec3(0, rotationOffset, 0));
-    glm::quat negRotationY = glm::quat(glm::vec3(0, -rotationOffset, 0));
-    glm::quat rotationZ = glm::quat(glm::vec3(0, 0, rotationOffset));
-    glm::quat negRotationZ = glm::quat(glm::vec3(0, 0, -rotationOffset));
+    glm::vec3 orientation = glm::vec3(0, 1, 0);
+    glm::quat x_quat = glm::quat(glm::vec3(this->angle_mod_, 0, 0));
+    glm::quat x_quat_neg = glm::quat(glm::vec3(-this->angle_mod_, 0, 0));
+    glm::quat y_quat = glm::quat(glm::vec3(0, this->angle_mod_, 0));
+    glm::quat y_quat_neg = glm::quat(glm::vec3(0, -this->angle_mod_, 0));
+    glm::quat z_quat = glm::quat(glm::vec3(0, 0, this->angle_mod_));
+    glm::quat z_quat_neg = glm::quat(glm::vec3(0, 0, -this->angle_mod_));
 
 
     glm::quat full_turn = glm::quat(glm::vec3(0, 0, 180));
@@ -137,10 +125,7 @@ void LSystem::GenerateVertices() {
             vertices_.push_back(current_position.y * this->scale_);
             vertices_.push_back(current_position.z * this->scale_);
 
-//            //correct way to rotate (can be applied in 3D Space)
-//            z_axis.x = current_position.x;
-//            z_axis.y = current_position.y;
-//
+
 //            glm::fmat4 rotationMatrixZ = glm::rotate(angle.z, z_axis);
 //
 //            //            std::cout << "angleZ: " << glm::degrees(angle.z) << std::endl;
@@ -152,7 +137,7 @@ void LSystem::GenerateVertices() {
 //            current_position.y = current_position.y + (glm::sin(angle.z + glm::radians(90.0f)));
 
 
-            current_position += translationVector;
+            current_position += orientation;
 
 
             vertices_.push_back(current_position.x * this->scale_);
@@ -161,71 +146,70 @@ void LSystem::GenerateVertices() {
 
             //Move forward by 1 without drawing a line, following the orientation "angle"
         } else if (this->fractal_string_[i] == 'f') {
-            current_position += translationVector;
+            current_position += orientation;
 
             //Turn left by angle_mod
         } else if (this->fractal_string_[i] == '+') {
 
             //modify angle
-            translationVector = glm::rotate(rotationZ, translationVector);
+            orientation = glm::rotate(z_quat, orientation);
 
 
             //Turn right by angle_mod
         } else if (this->fractal_string_[i] == '-') {
 
             //work out angle
-            translationVector = glm::rotate(negRotationZ, translationVector);
+            orientation = glm::rotate(z_quat_neg, orientation);
 
 
             //Pitch down by angle_mod
         } else if (this->fractal_string_[i] == '&') {
 
-            translationVector = glm::rotate(rotationY, translationVector);
+            orientation = glm::rotate(y_quat, orientation);
 
 
             //Pitch up by angle_mod
         } else if (this->fractal_string_[i] == '^') {
 
             //work out angle
-            translationVector = glm::rotate(negRotationY, translationVector);
+            orientation = glm::rotate(y_quat_neg, orientation);
 
 
             //Roll left by angle_mod
         } else if (this->fractal_string_[i] == '\\') {
 
             //work out angle
-            translationVector = glm::rotate(rotationX, translationVector);
+            orientation = glm::rotate(x_quat, orientation);
 
 
             //Roll right by angle_mod
         } else if (this->fractal_string_[i] == '/') {
 
             //work out angle
-            translationVector = glm::rotate(negRotationX, translationVector);
+            orientation = glm::rotate(x_quat_neg, orientation);
 
 
             //Turn around by 180 degrees
         } else if (this->fractal_string_[i] == '|') {
 
-            translationVector = glm::rotate(full_turn, translationVector);
+            orientation = glm::rotate(full_turn, orientation);
 
             //Push the current state of the turtle onto a stack
         } else if (this->fractal_string_[i] == '[') {
-            positionBuffer.push_back(current_position);
-            angleBuffer.push_back(translationVector);
-            levelNum++;
+            position_buffer.push_back(current_position);
+            angle_buffer.push_back(orientation);
+            level_num++;
 
             //Pop the state of the turtle off the stack
         } else if (this->fractal_string_[i] == ']') {
-            current_position = positionBuffer.back();
-            translationVector = angleBuffer.back();
-            positionBuffer.pop_back();
-            angleBuffer.pop_back();
-            levelNum--;
+            current_position = position_buffer.back();
+            orientation = angle_buffer.back();
+            position_buffer.pop_back();
+            angle_buffer.pop_back();
+            level_num--;
         }
     }
 
-    z_axis = {1, 1, 0};
     for (int i = 0; i < vertices_.size(); i += 3) {
 
         float vertex[] = {vertices_[i], vertices_[i + 1], vertices_[i + 2]};

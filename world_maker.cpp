@@ -68,7 +68,6 @@ vector<int> WorldMaker::get_num_trees_() const {
 }
 
 
-
 /**
  * Returns the diamond_square_ terrain object
  * @return
@@ -246,7 +245,7 @@ WorldMaker::ComputeFullDiamondSquareBuffers(vector<vector<GLuint >> &terrain_ver
     }
 
     ComputeDiamondSquareColourBuffers(gl_terrain_verts.at(diamond_square_->get_no_of_iterations() - 1),
-                                      diamond_square_colour_buffers);
+                                      diamond_square_colour_buffers, 3);
 
 }
 
@@ -257,16 +256,30 @@ WorldMaker::ComputeFullDiamondSquareBuffers(vector<vector<GLuint >> &terrain_ver
  */
 void
 WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrain_verts,
-                                              GLuint *diamond_square_colour_buffers) {
+                                              GLuint *diamond_square_colour_buffers,
+                                              int colour_palette) {
     ColourList colours;
     vector<vector<GLfloat>> g_color_buffer_data;
     g_color_buffer_data.resize(diamond_square_->get_no_of_terrain_vertex_arrays(),
                                vector<GLfloat>(diamond_square_->get_no_of_vertices(), 0));
 
-//  VertexColourRainbow(g_color_buffer_data);
-//  VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts);
-//  VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
-    VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
+    switch (colour_palette) {
+        case 0:
+            VertexColourRainbow(g_color_buffer_data);
+            break;
+        case 1:
+            VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts);
+            break;
+        case 2:
+            VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
+            break;
+        case 3:
+        default:
+            VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
+            break;
+
+    }
+
 
     for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         glGenBuffers(1, &diamond_square_colour_buffers[i]);
@@ -429,7 +442,7 @@ void WorldMaker::VertexColourRealBlended(vector<vector<GLfloat>> &g_color_buffer
                 g_color_buffer_data[i][j] = colours.light_grey[1] * rand_num;
                 g_color_buffer_data[i][j + 1] = colours.light_grey[2] * rand_num;
 
-            } else if (height <= 1) {
+            } else {
 
                 g_color_buffer_data[i][j - 1] = colours.snow_white[0] * rand_num;
                 g_color_buffer_data[i][j] = colours.snow_white[1] * rand_num;
@@ -457,4 +470,8 @@ GLfloat *WorldMaker::BlendColours(GLfloat colour_one[3], GLfloat colour_two[3], 
         blended_colour[i] = colour_two[i] + (range * percentage);
     }
     return blended_colour;
+}
+
+const vector<vector<vector<GLfloat>>> &WorldMaker::get_gl_terrain_verts() const {
+    return gl_terrain_verts;
 }

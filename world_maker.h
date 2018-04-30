@@ -51,6 +51,12 @@ public:
 
     float get_terrain_scale() const;
 
+    const vector<vector<vector<GLfloat>>> &get_gl_terrain_verts() const;
+
+    void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrain_verts,
+                                           GLuint *diamond_square_colour_buffers,
+                                           int colour_palette);
+
 private:
     int terrain_size_;
     int terrain_scale_;
@@ -66,8 +72,6 @@ private:
     ComputeFullDiamondSquareBuffers(vector<vector<GLuint >> &terrain_vertex_buffers,
                                     GLuint *diamond_square_colour_buffers);
 
-    void ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrain_verts,
-                                           GLuint *diamond_square_colour_buffers);
 
     void ComputeLSystemVertexBuffer(GLuint *vertex_buffer);
 
