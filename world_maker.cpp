@@ -372,7 +372,7 @@ WorldMaker::VertexColourReal(vector<vector<GLfloat>> &g_color_buffer_data, vecto
                 g_color_buffer_data[i][j] = colours.light_grey[1] * rand_num;
                 g_color_buffer_data[i][j + 1] = colours.light_grey[2] * rand_num;
 
-            } else if (height <= 1) {
+            } else {
                 g_color_buffer_data[i][j - 1] = colours.snow_white[0] * rand_num;
                 g_color_buffer_data[i][j] = colours.snow_white[1] * rand_num;
                 g_color_buffer_data[i][j + 1] = colours.snow_white[2] * rand_num;

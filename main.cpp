@@ -13,7 +13,6 @@ using namespace std;
 
 GLFWwindow *window;
 
-
 /**
  * Sets up the GLFW window
  * Code initially taken from http://opengl-tutorial.org
