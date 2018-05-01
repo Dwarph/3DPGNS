@@ -165,8 +165,8 @@ int OpenGLMagic() {
             lod_old = lod_current;
             lod_current = controls.get_lod_level();
             if (lod_current >= diamond_square_vertex_buffers.size()) {
-                lod_current = diamond_square_vertex_buffers.size() - 1;
                 lod_old = lod_current;
+                lod_current = diamond_square_vertex_buffers.size() - 1;
             }
         }
 
