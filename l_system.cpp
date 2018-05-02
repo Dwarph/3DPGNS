@@ -6,7 +6,6 @@
 #include <glm/detail/type_mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 #include "l_system.h"
@@ -104,13 +103,9 @@ void LSystem::GenerateVertices() {
     std::vector<glm::fvec3> angle_buffer;
 
     glm::vec3 orientation = glm::vec3(0, 1, 0);
-    glm::quat x_quat = glm::quat(glm::vec3(this->angle_mod_, 0, 0));
-    glm::quat x_quat_neg = glm::quat(glm::vec3(-this->angle_mod_, 0, 0));
-    glm::quat y_quat = glm::quat(glm::vec3(0, this->angle_mod_, 0));
-    glm::quat y_quat_neg = glm::quat(glm::vec3(0, -this->angle_mod_, 0));
-    glm::quat z_quat = glm::quat(glm::vec3(0, 0, this->angle_mod_));
-    glm::quat z_quat_neg = glm::quat(glm::vec3(0, 0, -this->angle_mod_));
 
+    int rand_range = 10;
+    float rand_angle = 0.5;
 
     glm::quat full_turn = glm::quat(glm::vec3(0, 0, 180));
 
@@ -152,42 +147,62 @@ void LSystem::GenerateVertices() {
         } else if (this->fractal_string_[i] == '+') {
 
             //modify angle
-            orientation = glm::rotate(z_quat, orientation);
 
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 2, this->angle_mod_);
+            } else {
+                update_orientation(orientation, 2, this->angle_mod_ + rand_angle);
+            }
 
             //Turn right by angle_mod
         } else if (this->fractal_string_[i] == '-') {
 
             //work out angle
-            orientation = glm::rotate(z_quat_neg, orientation);
 
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 2, this->angle_mod_ * -1);
+            } else {
+                update_orientation(orientation, 2, (this->angle_mod_ * -1) + rand_angle);
+            }
 
             //Pitch down by angle_mod
         } else if (this->fractal_string_[i] == '&') {
 
-            orientation = glm::rotate(y_quat, orientation);
-
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 1, this->angle_mod_);
+            } else {
+                update_orientation(orientation, 1, this->angle_mod_ + rand_angle);
+            }
 
             //Pitch up by angle_mod
         } else if (this->fractal_string_[i] == '^') {
 
             //work out angle
-            orientation = glm::rotate(y_quat_neg, orientation);
-
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 1, this->angle_mod_ * -1);
+            } else {
+                update_orientation(orientation, 1, (this->angle_mod_ * -1) + rand_angle);
+            }
 
             //Roll left by angle_mod
         } else if (this->fractal_string_[i] == '\\') {
 
             //work out angle
-            orientation = glm::rotate(x_quat, orientation);
-
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 0, this->angle_mod_);
+            } else {
+                update_orientation(orientation, 0, this->angle_mod_ + rand_angle);
+            }
 
             //Roll right by angle_mod
         } else if (this->fractal_string_[i] == '/') {
 
             //work out angle
-            orientation = glm::rotate(x_quat_neg, orientation);
-
+            if (5 != rand() % rand_range) {
+                update_orientation(orientation, 0, this->angle_mod_ * -1);
+            } else {
+                update_orientation(orientation, 0, (this->angle_mod_ * -1) + rand_angle);
+            }
 
             //Turn around by 180 degrees
         } else if (this->fractal_string_[i] == '|') {
@@ -220,6 +235,25 @@ void LSystem::GenerateVertices() {
         vertices_[i + 1] = vertex[1];
         vertices_[i + 2] = vertex[2];
 
+    }
+}
+
+void LSystem::update_orientation(glm::vec3 &orientation, int axis, float angle) {
+    switch (axis) {
+        //x
+        case 0:
+            orientation = glm::rotate(glm::quat(glm::vec3(angle, 0, 0)), orientation);
+            break;
+            //y
+        case 1:
+            orientation = glm::rotate(glm::quat(glm::vec3(0, angle, 0)), orientation);
+
+            break;
+            //z
+        case 2:
+            orientation = glm::rotate(glm::quat(glm::vec3(0, 0, angle)), orientation);
+
+            break;
     }
 }
 

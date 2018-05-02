@@ -43,6 +43,8 @@ private:
     float angle_mod_;
     float scale_;
 
+    void update_orientation(glm::vec3 &orientation, int axis, float angle);
+
 };
 
 

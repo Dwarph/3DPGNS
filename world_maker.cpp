@@ -147,14 +147,6 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
         glBufferData(GL_ARRAY_BUFFER, trees_.at(i).get_vertices().size() * sizeof(float), &trees_[i].get_vertices()[0],
                      GL_STATIC_DRAW);
     }
-
-
-    //    for (int i = 0; i < trees_->get_vertices().size(); i += 3) {
-//        cout << "{x: " << trees_->get_vertices()[i] <<
-//             ", y: " << trees_->get_vertices()[i + 1] <<
-//             ", z: " << trees_->get_vertices()[i + 2] << "}, ";
-//    }
-//    cout << endl;
 }
 
 
@@ -167,15 +159,12 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
  */
 void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer) {
     int tree_num = 0;
-    int num_l_systems_size = this->num_l_systems_.size();
+    int num_l_systems_size = (int) this->num_l_systems_.size();
 
-    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
-    this->tree_positions_.at(tree_num).push_back(
-            diamond_square_->get_height(diamond_square_->get_no_of_iterations() - 1, 0, 0) *
-            this->terrain_scale_);
-    this->tree_positions_.at(tree_num).push_back(0 * this->terrain_scale_);
-    this->num_l_systems_.at(tree_num)++;
-
+    /*
+     * Loop through the entire grid
+     * 1 in 200 chance of displaying a randomly selected L-System
+     */
     for (int x = 0; x < diamond_square_->get_max_size(); x++) {
         for (int z = 0; z < diamond_square_->get_max_size(); z++) {
             if (diamond_square_->RandInRange(200, false) == 3) {

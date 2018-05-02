@@ -231,8 +231,6 @@ void DiamondSquare::GenerateHeightMap() {
             }
         }
 
-        //   PrintGrid("diamond: ");
-
         for (int z = 0; z < max_size_; z += halfSize) {
             for (int x = 0; x < max_size_; x += halfSize) {
                 randNum = ((float) RandInRange(randInt, true)) / randInt;
@@ -240,9 +238,6 @@ void DiamondSquare::GenerateHeightMap() {
                 SquareStep(iterations, x, z, halfSize, offset);
             }
         }
-
-        //   PrintGrid( "square: ");
-
         stepSize /= 2;
         iterations++;
 
@@ -288,8 +283,6 @@ void DiamondSquare::GenerateHeightMap() {
                     }
                 }
             }
-
-
         }
         auto iterator_z = remove_if(height_map_[itr].begin(), height_map_[itr].end(), removeEmpty);
         height_map_[itr].erase(iterator_z, height_map_[itr].end());
@@ -491,19 +484,3 @@ void DiamondSquare::ResizeVector2(std::vector<std::vector<float> > &vec, const u
         it.resize(COLUMNS);
     }
 }
-
-//http://www.cplusplus.com/forum/beginner/102670/ source
-void DiamondSquare::ResizeVector3(std::vector<std::vector<std::vector<float> > > &vec, const unsigned short DEPTH,
-                                  const unsigned short ROWS,
-                                  const unsigned short COLUMNS) {
-    vec.resize(DEPTH);
-    for (int i = 0; i < vec.size(); ++i) {
-        vec.at(i).resize(ROWS);
-        for (int j = 0; j < vec.at(i).size(); ++j) {
-            vec.at(i).at(j).resize(COLUMNS);
-        }
-    }
-
-}
-
-
