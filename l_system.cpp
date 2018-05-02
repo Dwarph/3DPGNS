@@ -104,7 +104,7 @@ void LSystem::GenerateVertices() {
 
     glm::vec3 orientation = glm::vec3(0, 1, 0);
 
-    int rand_range = 10;
+    int rand_range = 5;
     float rand_angle = 0.5;
 
     glm::quat full_turn = glm::quat(glm::vec3(0, 0, 180));
@@ -148,7 +148,7 @@ void LSystem::GenerateVertices() {
 
             //modify angle
 
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 2, this->angle_mod_);
             } else {
                 update_orientation(orientation, 2, this->angle_mod_ + rand_angle);
@@ -159,7 +159,7 @@ void LSystem::GenerateVertices() {
 
             //work out angle
 
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 2, this->angle_mod_ * -1);
             } else {
                 update_orientation(orientation, 2, (this->angle_mod_ * -1) + rand_angle);
@@ -168,7 +168,7 @@ void LSystem::GenerateVertices() {
             //Pitch down by angle_mod
         } else if (this->fractal_string_[i] == '&') {
 
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 1, this->angle_mod_);
             } else {
                 update_orientation(orientation, 1, this->angle_mod_ + rand_angle);
@@ -178,7 +178,7 @@ void LSystem::GenerateVertices() {
         } else if (this->fractal_string_[i] == '^') {
 
             //work out angle
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 1, this->angle_mod_ * -1);
             } else {
                 update_orientation(orientation, 1, (this->angle_mod_ * -1) + rand_angle);
@@ -188,7 +188,7 @@ void LSystem::GenerateVertices() {
         } else if (this->fractal_string_[i] == '\\') {
 
             //work out angle
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 0, this->angle_mod_);
             } else {
                 update_orientation(orientation, 0, this->angle_mod_ + rand_angle);
@@ -198,7 +198,7 @@ void LSystem::GenerateVertices() {
         } else if (this->fractal_string_[i] == '/') {
 
             //work out angle
-            if (5 != rand() % rand_range) {
+            if (1 != rand() % rand_range) {
                 update_orientation(orientation, 0, this->angle_mod_ * -1);
             } else {
                 update_orientation(orientation, 0, (this->angle_mod_ * -1) + rand_angle);
