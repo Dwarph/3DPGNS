@@ -8,8 +8,7 @@ TerrainQuadTree::TerrainQuadTree(int no_of_iterations) : no_of_iterations(no_of_
 
 
 void TerrainQuadTree::GenerateQuadTree(glm::vec3 camera_position,
-                                       std::vector<std::vector<std::vector<GLfloat>>> &height_map,
-                                       std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
+                                       std::vector<std::vector<std::vector<GLfloat>>> &height_map) {
 
     int final_size = height_map.back().size();
     float max_length = height_map.back().back().back();
@@ -46,10 +45,18 @@ void TerrainQuadTree::GenerateQuadTree(glm::vec3 camera_position,
     }
 }
 
+
+Node *TerrainQuadTree::get_root() {
+    return &root;
+}
+
+int TerrainQuadTree::get_no_of_iterations() const {
+    return no_of_iterations;
+}
+
 void TerrainQuadTree::GenerateHeightMap(std::vector<GLfloat> &vertices,
                                         std::vector<std::vector<std::vector<GLfloat>>> &height_map,
                                         std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts) {
-
 
     Node *current_node = &root;
 
@@ -207,4 +214,3 @@ void TerrainQuadTree::SplitNode(Node *node, float step_size, int iteration) {
                                                       node->boundary_top_right.y - step_size);
     node->top_right->boundary_top_right = node->boundary_top_right;
 }
-

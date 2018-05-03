@@ -5,9 +5,14 @@
 #define BOOST_TEST_MODULE MyTest
 
 #include <boost/test/included/unit_test.hpp>
+#include <glm/detail/func_trigonometric.inl>
 
 #include "../diamond_square.h"
+#include "../l_system.h"
+#include "../terrain_quad_tree.h"
 
+
+/* =============== Diamond Square Tests =============== */
 
 BOOST_AUTO_TEST_CASE(diamond_square_map_size) {
 
@@ -79,7 +84,78 @@ BOOST_AUTO_TEST_CASE(diamond_square_size_check) {
     }
 }
 
+/* =============== L-System Tests =============== */
 
-BOOST_AUTO_TEST_CASE(l_system_initial_checks) {
+
+BOOST_AUTO_TEST_CASE(l_system_fractal_string_generation) {
+    LSystem tree = LSystem("B", 6, 0, 1);
+
+    Rule rule_a, rule_b;
+    rule_a.axiom = 'A';
+    rule_a.rule = "AB";
+    rule_b.axiom = 'B';
+    rule_b.rule = "A";
+    tree.AddRule(rule_a);
+    tree.AddRule(rule_b);
+    tree.GenerateFractal();
+    cout << tree.get_fractal_string_() << endl;
+    BOOST_CHECK("ABAABABAABAAB" == tree.get_fractal_string_());
 
 }
+
+BOOST_AUTO_TEST_CASE(l_system_rule_addition) {
+    LSystem tree = LSystem("B", 6, 0, 1);
+    Rule rule_a;
+    rule_a.axiom = 'A';
+    rule_a.rule = "AB";
+    tree.AddRule(rule_a);
+    vector<Rule> rules = tree.get_rules_();
+    BOOST_CHECK(find(rules.begin(), rules.end(), rule_a) != rules.end());
+
+}
+
+
+BOOST_AUTO_TEST_CASE(l_system_constructor) {
+    LSystem tree = LSystem("B", 6, 23.0, 1);
+    Rule rule_a;
+    float rads = glm::radians(23.0);
+
+    BOOST_CHECK(tree.get_fractal_string_() == "B");
+    BOOST_CHECK(tree.get_no_of_iterations_() == 6);
+    BOOST_CHECK(tree.get_angle_mod_() == rads);
+    BOOST_CHECK(tree.get_scale_() == 1);
+
+}
+
+/* =============== Quad-Tree Tests =============== */
+
+BOOST_AUTO_TEST_CASE(quad_tree_constructor) {
+    TerrainQuadTree terrain_quad_tree = TerrainQuadTree(4);
+
+    BOOST_CHECK(terrain_quad_tree.get_no_of_iterations() == 4);
+}
+
+int CountNodes(Node *node, int no_of_nodes) {
+    if (node->is_leaf) {
+        return no_of_nodes + 1;
+    }
+
+    no_of_nodes = CountNodes(node->top_right, no_of_nodes);
+    no_of_nodes = CountNodes(node->top_left, no_of_nodes);
+    no_of_nodes = CountNodes(node->bottom_right, no_of_nodes);
+    no_of_nodes = CountNodes(node->bottom_left, no_of_nodes);
+
+    return no_of_nodes + 1;
+}
+
+BOOST_AUTO_TEST_CASE(quad_tree_iterations) {
+    DiamondSquare diamondSquare = DiamondSquare(10, 9);
+    TerrainQuadTree terrain_quad_tree = TerrainQuadTree(4);
+    glm::vec3 position = glm::vec3(0, 0, 0);
+    vector<vector<vector<float>>> height_map = diamondSquare.get_height_map();
+    Node *node = terrain_quad_tree.get_root();
+    terrain_quad_tree.GenerateQuadTree(position, height_map);
+
+    BOOST_CHECK(CountNodes(node, 0) == 17);
+}
+

@@ -14,6 +14,11 @@
 struct Rule {
     char axiom;
     std::string rule;
+
+    bool operator==(const Rule &rule) const {
+        return rule.axiom == axiom && rule.rule == this->rule;
+    };
+
 };
 
 class LSystem {
@@ -22,16 +27,27 @@ public:
 
     LSystem(const std::string &seed, int no_of_iterations, float angleMod, float scale);
 
+    void set_seed(const std::string &seed);
+
+    const std::vector<GLfloat> &get_vertices() const;
+
+    const std::string &get_seed_() const;
+
+    int get_no_of_iterations_() const;
+
+    const std::vector<Rule> &get_rules_() const;
+
+    float get_angle_mod_() const;
+
+    float get_scale_() const;
+
+    const std::string &get_fractal_string_() const;
+
     void GenerateFractal();
 
     void AddRule(Rule rule);
 
     void GenerateVertices();
-
-    void set_seed(const std::string &seed);
-
-    const std::vector<GLfloat> &get_vertices() const;
-
 
 private:
 

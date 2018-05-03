@@ -117,25 +117,25 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
 
     trees_.push_back(LSystem("X", 7, 20, 0.3));
 
-    Rule ruleX, ruleF;
-    ruleX.axiom = 'X';
-    ruleX.rule = "F[+X]F[-X]+X";
-    ruleF.axiom = 'F';
-    ruleF.rule = "FF";
-    trees_.at(0).AddRule(ruleX);
-    trees_.at(0).AddRule(ruleF);
+    Rule rule_x, rule_f;
+    rule_x.axiom = 'X';
+    rule_x.rule = "F[+X]F[-X]+X";
+    rule_f.axiom = 'F';
+    rule_f.rule = "FF";
+    trees_.at(0).AddRule(rule_x);
+    trees_.at(0).AddRule(rule_f);
 
     trees_.push_back(LSystem("X", 7, 25.7, 0.3));
-    ruleX.axiom = 'X';
-    ruleX.rule = "F[+X][-X]FX";
-    trees_.at(1).AddRule(ruleX);
-    trees_.at(1).AddRule(ruleF);
+    rule_x.axiom = 'X';
+    rule_x.rule = "F[+X][-X]FX";
+    trees_.at(1).AddRule(rule_x);
+    trees_.at(1).AddRule(rule_f);
 
     trees_.push_back(LSystem("X", 5, 22.7, 0.8));
-    ruleX.axiom = 'X';
-    ruleX.rule = "F-[[X]+]+F[+FX]-X";
-    trees_.at(2).AddRule(ruleX);
-    trees_.at(2).AddRule(ruleF);
+    rule_x.axiom = 'X';
+    rule_x.rule = "F-[[X]+]+F[+FX]-X";
+    trees_.at(2).AddRule(rule_x);
+    trees_.at(2).AddRule(rule_f);
 
 
     for (int i = 0; i < num_l_systems_.size(); ++i) {
@@ -196,7 +196,7 @@ void WorldMaker::ComputeDiamondSquareLOD(GLuint &terrain_vertex_buffer, GLuint *
     TerrainQuadTree terrainQuadTree = TerrainQuadTree(4);
     std::vector<std::vector<std::vector<float>>> height_map = diamond_square_->get_height_map();
 
-    terrainQuadTree.GenerateQuadTree(position, height_map, gl_terrain_verts);
+    terrainQuadTree.GenerateQuadTree(position, height_map);
     terrainQuadTree.GenerateHeightMap(gl_terrain_verts_lod, height_map, gl_terrain_verts);
 
     glGenBuffers(1, &terrain_vertex_buffer);
@@ -304,9 +304,10 @@ void WorldMaker::VertexColourGreyscale(vector<vector<GLfloat>> &g_color_buffer_d
 
     for (int i = 0; i < diamond_square_->get_no_of_terrain_vertex_arrays(); i++) {
         for (int j = 1; j < diamond_square_->get_no_of_vertices(); j += 3) {
-            g_color_buffer_data[i][j - 1] = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
-            g_color_buffer_data[i][j] = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
-            g_color_buffer_data[i][j + 1] = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
+            float colour = (gl_terrain_verts[i][j] - diamond_square_->get_min_height()) / height_range;
+            g_color_buffer_data[i][j - 1] = colour;
+            g_color_buffer_data[i][j] = colour;
+            g_color_buffer_data[i][j + 1] = colour;
         }
     }
 }

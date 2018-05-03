@@ -42,6 +42,54 @@ const std::vector<GLfloat> &LSystem::get_vertices() const {
 }
 
 /**
+ * Returns the fractal string generated
+ * @return string
+ */
+const std::string &LSystem::get_fractal_string_() const {
+    return fractal_string_;
+}
+
+/**
+ * Returns the seed
+ * @return string
+ */
+const std::string &LSystem::get_seed_() const {
+    return seed_;
+}
+
+/**
+ * Returns the no_of_iterations
+ * @return int
+ */
+int LSystem::get_no_of_iterations_() const {
+    return no_of_iterations_;
+}
+
+/**
+ * Returns a vector containing the rules
+ * @return
+ */
+const std::vector<Rule> &LSystem::get_rules_() const {
+    return rules_;
+}
+
+/**
+ * Returns the angle_mod_
+ * @return float
+ */
+float LSystem::get_angle_mod_() const {
+    return angle_mod_;
+}
+
+/**
+ * Returns the scale
+ * @return float
+ */
+float LSystem::get_scale_() const {
+    return scale_;
+}
+
+/**
  * Sets the seed
  * @param seed
  */
@@ -120,20 +168,7 @@ void LSystem::GenerateVertices() {
             vertices_.push_back(current_position.y * this->scale_);
             vertices_.push_back(current_position.z * this->scale_);
 
-
-//            glm::fmat4 rotationMatrixZ = glm::rotate(angle.z, z_axis);
-//
-//            //            std::cout << "angleZ: " << glm::degrees(angle.z) << std::endl;
-//
-//            current_position = translation * rotationMatrixZ * current_position;
-
-//            // rotation only able to be applied in 2D space - but it works in 2D!
-//            current_position.x = current_position.x + (glm::cos(angle.z + glm::radians(90.0f)));
-//            current_position.y = current_position.y + (glm::sin(angle.z + glm::radians(90.0f)));
-
-
             current_position += orientation;
-
 
             vertices_.push_back(current_position.x * this->scale_);
             vertices_.push_back(current_position.y * this->scale_);
@@ -240,24 +275,20 @@ void LSystem::GenerateVertices() {
 
 void LSystem::update_orientation(glm::vec3 &orientation, int axis, float angle) {
     switch (axis) {
+
         //x
         case 0:
             orientation = glm::rotate(glm::quat(glm::vec3(angle, 0, 0)), orientation);
-            break;
+            return;
+
             //y
         case 1:
             orientation = glm::rotate(glm::quat(glm::vec3(0, angle, 0)), orientation);
+            return;
 
-            break;
             //z
         case 2:
             orientation = glm::rotate(glm::quat(glm::vec3(0, 0, angle)), orientation);
-
-            break;
+            return;
     }
 }
-
-
-
-
-

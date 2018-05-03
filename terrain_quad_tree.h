@@ -13,7 +13,6 @@
 #include <iostream>
 
 
-
 struct Node {
     Node *top_left;
     Node *top_right;
@@ -31,28 +30,29 @@ public:
 
     TerrainQuadTree(int no_of_iterations);
 
+    Node *get_root();
 
-    void GenerateQuadTree(glm::vec3 position, std::vector<std::vector<std::vector<GLfloat>>> &height_map,
-                          std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts);
+    int get_no_of_iterations() const;
+
+    void GenerateQuadTree(glm::vec3 position, std::vector<std::vector<std::vector<GLfloat>>> &height_map);
 
     void GenerateHeightMap(std::vector<GLfloat> &vertices,
                            std::vector<std::vector<std::vector<GLfloat>>> &height_map,
                            std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts);
+
 
 private:
 
     Node root;
     int no_of_iterations;
 
-
     void AssignVertices(Node *node, std::vector<GLfloat> &vertices,
                         std::vector<std::vector<std::vector<GLfloat>>> &height_map,
                         std::vector<std::vector<std::vector<GLfloat>>> &gl_terrain_verts);
 
-    void
-    PushVertices(Node *node, std::vector<GLfloat> &vertices,
-                 std::vector<std::vector<GLfloat>> &height_map,
-                 std::vector<std::vector<GLfloat>> &gl_terrain_verts);
+    void PushVertices(Node *node, std::vector<GLfloat> &vertices,
+                      std::vector<std::vector<GLfloat>> &height_map,
+                      std::vector<std::vector<GLfloat>> &gl_terrain_verts);
 
     bool IsInNode(Node *n, float step_size, glm::vec3 position);
 
