@@ -1,6 +1,17 @@
 #ifndef CONTROLS_HPP
 #define CONTROLS_HPP
 
+// Include GLFW
+#include <glfw3.h>
+
+extern GLFWwindow *window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
+
+// Include GLM
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+using namespace glm;
+
 
 class Controls {
 
@@ -46,6 +57,9 @@ private:
     int colour_palette;
     bool show_l_systems;
     bool show_terrain;
+
+    glm::mat4 ViewMatrix;
+    glm::mat4 ProjectionMatrix;
 
 
 };

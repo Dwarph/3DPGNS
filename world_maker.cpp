@@ -27,6 +27,14 @@ WorldMaker::WorldMaker(int terrain_size, float scale) : terrain_size_(terrain_si
 /* Getters and Setters */
 
 /**
+ * Gets the terrain vertices
+ * @return
+ */
+const vector<vector<vector<GLfloat>>> &WorldMaker::get_gl_terrain_verts() const {
+    return gl_terrain_verts;
+}
+
+/**
  * Gets the terrain size
  * @return
  */
@@ -38,7 +46,6 @@ int WorldMaker::get_terrain_size() const {
  * Gets the scale used for resizing the terrain and subsequently tree positioning
  * @return
  */
-
 float WorldMaker::get_terrain_scale() const {
     return terrain_scale_;
 }
@@ -66,7 +73,6 @@ const vector<vector<GLfloat>> &WorldMaker::get_tree_positions_() const {
 vector<int> WorldMaker::get_num_trees_() const {
     return num_l_systems_;
 }
-
 
 /**
  * Returns the diamond_square_ terrain object
@@ -115,7 +121,7 @@ void WorldMaker::MakeWorld(vector<vector<GLuint >> &terrain_vertex_buffers,
  */
 void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
 
-    trees_.push_back(LSystem("X", 7, 20, 0.3));
+    trees_.emplace_back(LSystem("X", 7, 20, 0.3));
 
     Rule rule_x, rule_f;
     rule_x.axiom = 'X';
@@ -125,20 +131,20 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
     trees_.at(0).AddRule(rule_x);
     trees_.at(0).AddRule(rule_f);
 
-    trees_.push_back(LSystem("X", 7, 25.7, 0.3));
+    trees_.emplace_back(LSystem("X", 7, 25.7, 0.3));
     rule_x.axiom = 'X';
     rule_x.rule = "F[+X][-X]FX";
     trees_.at(1).AddRule(rule_x);
     trees_.at(1).AddRule(rule_f);
 
-    trees_.push_back(LSystem("X", 5, 22.7, 0.8));
+    trees_.emplace_back(LSystem("X", 5, 22.7, 0.8));
     rule_x.axiom = 'X';
     rule_x.rule = "F-[[X]+]+F[+FX]-X";
     trees_.at(2).AddRule(rule_x);
     trees_.at(2).AddRule(rule_f);
 
 
-    for (int i = 0; i < num_l_systems_.size(); ++i) {
+    for (unsigned long i = 0; i < num_l_systems_.size(); ++i) {
         trees_.at(i).GenerateFractal();
         trees_.at(i).GenerateVertices();
 
@@ -159,7 +165,7 @@ void WorldMaker::ComputeLSystemVertexBuffer(GLuint *vertex_buffers) {
  */
 void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer) {
     int tree_num = 0;
-    int num_l_systems_size = (int) this->num_l_systems_.size();
+    auto num_l_systems_size = (int) this->num_l_systems_.size();
 
     /*
      * Loop through the entire grid
@@ -189,11 +195,17 @@ void WorldMaker::GenerateTreePositionBuffer(GLuint *tree_position_vertex_buffer)
     }
 }
 
+/**
+ * Works out the Quadtree vertices and binds them to the buffer
+ * @param terrain_vertex_buffer
+ * @param diamond_square_colour_buffers
+ * @param position
+ */
 void WorldMaker::ComputeDiamondSquareLOD(GLuint &terrain_vertex_buffer, GLuint *diamond_square_colour_buffers,
                                          glm::vec3 position) {
 
     std::vector<GLfloat> gl_terrain_verts_lod;
-    TerrainQuadTree terrainQuadTree = TerrainQuadTree(4);
+    auto terrainQuadTree = TerrainQuadTree(4);
     std::vector<std::vector<std::vector<float>>> height_map = diamond_square_->get_height_map();
 
     terrainQuadTree.GenerateQuadTree(position, height_map);
@@ -256,17 +268,19 @@ WorldMaker::ComputeDiamondSquareColourBuffers(vector<vector<GLfloat>> &gl_terrai
         case 0:
             VertexColourRainbow(g_color_buffer_data);
             break;
+
         case 1:
             VertexColourGreyscale(g_color_buffer_data, gl_terrain_verts);
             break;
+
         case 2:
             VertexColourReal(g_color_buffer_data, gl_terrain_verts, colours);
             break;
+
         case 3:
         default:
             VertexColourRealBlended(g_color_buffer_data, gl_terrain_verts, colours);
             break;
-
     }
 
 
@@ -460,8 +474,4 @@ GLfloat *WorldMaker::BlendColours(GLfloat colour_one[3], GLfloat colour_two[3], 
         blended_colour[i] = colour_two[i] + (range * percentage);
     }
     return blended_colour;
-}
-
-const vector<vector<vector<GLfloat>>> &WorldMaker::get_gl_terrain_verts() const {
-    return gl_terrain_verts;
 }

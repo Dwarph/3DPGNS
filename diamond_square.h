@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -47,9 +49,6 @@ public:
     int RandInRange(int range, bool negative);
 
     void ResizeVector2(std::vector<std::vector<float> > &vec, const unsigned short ROWS, const unsigned short COLUMNS);
-
-    void ResizeVector3(std::vector<std::vector<std::vector<float> > > &vec, const unsigned short ROWS,
-                       const unsigned short COLUMNS, const unsigned short DEPTH);
 
 private :
 

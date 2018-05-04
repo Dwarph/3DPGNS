@@ -93,11 +93,11 @@ int OpenGLMagic() {
     glBindVertexArray(VertexArrayID);
 
     // Create and compile our GLSL program from the shaders
-    GLuint terrain_shaders = LoadShaders("external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader",
-                                         "external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader");
+    GLuint terrain_shaders = LoadShaders("../external/OpenGLTutorialUsefulFiles/TransformVertexShader.vertexshader",
+                                         "../external/OpenGLTutorialUsefulFiles/ColorFragmentShader.fragmentshader");
 
-    GLuint l_system_shaders = LoadShaders("Shaders/l_system_transform.vert.glsl",
-                                          "Shaders/l_system_colour.frag.glsl");
+    GLuint l_system_shaders = LoadShaders("../Shaders/l_system_transform.vert.glsl",
+                                          "../Shaders/l_system_colour.frag.glsl");
 
     // Get a handle for our terrain_shaders uniform
     GLint terrain_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
@@ -105,6 +105,7 @@ int OpenGLMagic() {
     // Get a handle for our l_system shaders uniform
     GLint l_system_shaders_uniform_id = glGetUniformLocation(terrain_shaders, "MVP");
 
+    //creates a new world maker to control our generation
     WorldMaker world_maker = WorldMaker(9, 10);
 
 
@@ -114,6 +115,8 @@ int OpenGLMagic() {
 
 
     diamond_square_vertex_buffers.resize(world_maker.get_diamond_square()->get_no_of_iterations());
+
+    //resizes vector to correct size
     for (int i = 0; i < diamond_square_vertex_buffers.size(); i++) {
         diamond_square_vertex_buffers.at(i).resize(world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays());
     }
@@ -123,6 +126,7 @@ int OpenGLMagic() {
     GLuint tree_vertex_buffer[world_maker.get_num_l_systems()];
     GLuint tree_position_vertex_buffer[world_maker.get_num_l_systems()];
 
+    //generates the vertices, binding them to their buffers
     world_maker.MakeWorld(diamond_square_vertex_buffers,
                           diamond_square_colour_buffers,
                           tree_vertex_buffer,
@@ -149,42 +153,51 @@ int OpenGLMagic() {
         controls.check_keypress();
         controls.computeMatricesFromInputs();
 
+        //if the colour palette needs changing
         if (controls.get_colour_palette() != colour_palette_old) {
+
             colour_palette_old = colour_palette_current;
             colour_palette_current = controls.get_colour_palette();
 
             vector<vector<vector<GLfloat>>> vertices = world_maker.get_gl_terrain_verts();
+
+            //generate the new colour palette
             world_maker.ComputeDiamondSquareColourBuffers(vertices.at(lod_current), diamond_square_colour_buffers,
                                                           colour_palette_current);
         }
 
+        //if the level of detail needs changing
         if (controls.get_lod_level() != lod_old) {
+
             vector<vector<vector<GLfloat>>> vertices = world_maker.get_gl_terrain_verts();
             world_maker.ComputeDiamondSquareColourBuffers(vertices.at(lod_current), diamond_square_colour_buffers,
                                                           colour_palette_current);
             lod_old = lod_current;
             lod_current = controls.get_lod_level();
+
+            //show the new LOD
             if (lod_current >= diamond_square_vertex_buffers.size()) {
                 lod_old = lod_current;
                 lod_current = diamond_square_vertex_buffers.size() - 1;
             }
         }
 
+
+        //update MVP for camera
         mat4 ProjectionMatrix = controls.getProjectionMatrix();
         mat4 ViewMatrix = controls.getViewMatrix();
         mat4 ModelMatrix = glm::mat4(1.0);
         mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 
-/** Terrain display commands**/
-// Send our transformation to the currently bound shader,
-// in the "MVP" uniform
+        /** Terrain display commands**/
+        // Send our transformation to the currently bound shader,
+        // in the "MVP" uniform
 
-
-
+        //if terrain is being shown
         if (controls.is_show_terrain()) {
 
-// Use terrain shader
+            // Use terrain shader
             glUseProgram(terrain_shaders);
 
             glVertexAttribDivisor(1, 0); // disables instancing for the specified index
@@ -221,6 +234,7 @@ int OpenGLMagic() {
             }
         }
 
+        //if l-systems are being shown
         if (controls.is_show_l_systems()) {
 
             glUseProgram(l_system_shaders);
@@ -254,7 +268,7 @@ int OpenGLMagic() {
                 glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
                 glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
 
-
+                //draw the L-Systems
                 glDrawArraysInstanced(GL_LINES, 0, world_maker.get_tree()[i].get_vertices().size() / 3,
                                       world_maker.get_num_trees_()[i]);
             }
@@ -264,21 +278,21 @@ int OpenGLMagic() {
         glDisableVertexAttribArray(2);
 
 
-// Swap buffers
+        // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
 
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
     // Check if the ESC key was pressed or the window was closed
 
-// Cleanup VBO and shader
 
+    // Cleanup VBO and shader
     for (int i = 0; i < diamond_square_vertex_buffers.size(); i++) {
         for (int j = 0; j < diamond_square_vertex_buffers.at(i).size(); j++) {
             glDeleteBuffers(1, &diamond_square_vertex_buffers[i][j]);
         }
-
     }
+
     for (int i = 0; i < world_maker.get_diamond_square()->get_no_of_terrain_vertex_arrays(); i++) {
         glDeleteBuffers(1, &diamond_square_colour_buffers[i]);
     }

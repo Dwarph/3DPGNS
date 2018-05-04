@@ -1,8 +1,7 @@
 //
 // Created by pip on 22/02/18.
 //
-#include <cmath>
-#include <algorithm>
+
 #include "diamond_square.h"
 
 /**
@@ -13,16 +12,13 @@
 
 /* Constructors */
 
+
 /**
- * Our constructor intialises the size of the width and depth using max,
- * the range of roughness using rough_max and tells our class the number of
- * terrain vertex arrays we will be using
- * @param max
+ * Our constructor intialises the number of iterations using no_of_iterations
+ * It also initalises all other variables needed to generate a heightmap, before generating a heightmap!
  * @param rough_max
- * @param no_of_terrain_vertex_arrays
  * @param int no_of_iterations
  */
-
 DiamondSquare::DiamondSquare(int rough_max, int no_of_iterations) {
 
     this->no_of_iterations = no_of_iterations;
@@ -56,12 +52,11 @@ DiamondSquare::DiamondSquare(int rough_max, int no_of_iterations) {
     //sets the seed_ of the random number generator algorithm used by the function rand using the internal clock.
     srand(time(NULL));
 
+
     //calculates the roughness_ of the terrain randomly
 //    this->roughness_ = (((float) (rand() % (rough_max) + 1)) * 0.01) + 0.05;
 
     this->roughness_ = 0.15;
-
-    cout << "ROUGH: " << this->roughness_ << endl;
 
     //generates the height map
     this->GenerateHeightMap();
@@ -93,6 +88,8 @@ float DiamondSquare::get_height(int grid_num, int x, int z) {
  * Gets a value at the point {x, z}.
  * If the values given are outside of the grid, this function wraps them to the other side of the grid.
  * E.G. if the grid is x: 0-4, z: 0-4 and this function is given {5,5}, it will return the value at {0,0}
+ * It gets the height for the iteration grid_num
+ * @param grid_num
  * @param x
  * @param z
  * @return
@@ -165,9 +162,11 @@ vector<vector<vector<float>>> DiamondSquare::get_height_map() {
 }
 
 /**
- * Sets the vertice at the point [index] to the point {x * scale, get_height(x, z) * scale, z * scale}
+ * Sets the vertice at the point [index], in Iteration grid_num
+ * to the point {x * scale, get_height(x, z) * scale, z * scale}
  * @param vertices
  * @param index
+ * @param grid_num
  * @param x
  * @param z
  * @param scale
@@ -224,7 +223,6 @@ void DiamondSquare::GenerateHeightMap() {
 
         for (int z = 0; z < max_size_ - 1; z += stepSize) {
             for (int x = 0; x < max_size_ - 1; x += stepSize) {
-
                 randNum = ((float) RandInRange(randInt, true)) / randInt;
                 offset = randNum * scale * 2 - scale;
                 DiamondStep(iterations, x, z, stepSize, offset);
@@ -246,8 +244,6 @@ void DiamondSquare::GenerateHeightMap() {
         }
 
     }
-    cout << "ITERATIONS:" << iterations << endl;
-
 
     float heightOffset = height_map_[height_map_.size() - 1][0][0];
 
@@ -296,6 +292,7 @@ void DiamondSquare::GenerateHeightMap() {
 /**
  * This performs a "Square Step", getting values from 4 points surrounding the current point,
  * averaging them and setting the current point to them, before adding the offset
+ * @param grid_num
  * @param x
  * @param z
  * @param step
@@ -315,6 +312,7 @@ void DiamondSquare::SquareStep(int grid_num, int x, int z, int step, float offse
  *  This performs a "Diamond Step", getting values from 4 points different to the Square Step
  *  surrounding the current point, averaging them and setting the current point to them,
  *  before adding the offset
+ * @param grid_num
  * @param x
  * @param z
  * @param step
@@ -340,8 +338,6 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
 
     //used to keep track of the index we are currently on
     int index = 0;
-
-    //*2 for noOfTriangles, then *3 for noOfVerts, then 3 for number of points. Divide by number of arrays
     int count = 0;
 
     //iterates over the depth (z) and the width (x)
@@ -393,12 +389,9 @@ void DiamondSquare::GenerateVertices(vector<vector<vector<GLfloat>>> &gl_terrain
             }
         }
     }
-    //ensure the max and min heighpip_is_coolts adhere to the scale
+    //ensure the max and min heights adhere to the scale
     this->max_height_ *= scale;
     this->min_height_ *= scale;
-
-    cout << "MAX: " << this->get_max_height() << endl;
-    cout << "MIN: " << this->get_min_height() << endl;
 }
 
 /* HELPER FUNCTIONS */
@@ -430,7 +423,7 @@ float DiamondSquare::AverageValues(float *values) {
 /* Helper Functions */
 
 /**
- * Prints out the heightmap, beginning with the string "initial"
+ * Prints out the heightmap iteration at grid_num, beginning with the string initial
  * If show_zero is true, then zeros are also displayed
  * @param initial
  */

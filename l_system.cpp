@@ -143,23 +143,21 @@ void LSystem::GenerateFractal() {
  */
 void LSystem::GenerateVertices() {
 
-
-    glm::fvec3 current_position = {0, 0, 0};
     int level_num = 1;
+    int rand_range = 5;
+    float rand_angle = 0.5;
 
     std::vector<glm::fvec3> position_buffer;
     std::vector<glm::fvec3> angle_buffer;
 
+    glm::fvec3 current_position = {0, 0, 0};
     glm::vec3 orientation = glm::vec3(0, 1, 0);
-
-    int rand_range = 5;
-    float rand_angle = 0.5;
 
     glm::quat full_turn = glm::quat(glm::vec3(0, 0, 180));
 
     for (int i = 0; i < this->fractal_string_.length(); i++) {
 
-        //Draw a line and move forward by 1, following the orientation "angle"
+        //Draw a line and move forward by 1, by angle orientation
         if (this->fractal_string_[i] == 'F') {
 
             glm::fvec3 old_position = current_position;
@@ -181,8 +179,6 @@ void LSystem::GenerateVertices() {
             //Turn left by angle_mod
         } else if (this->fractal_string_[i] == '+') {
 
-            //modify angle
-
             if (1 != rand() % rand_range) {
                 update_orientation(orientation, 2, this->angle_mod_);
             } else {
@@ -191,8 +187,6 @@ void LSystem::GenerateVertices() {
 
             //Turn right by angle_mod
         } else if (this->fractal_string_[i] == '-') {
-
-            //work out angle
 
             if (1 != rand() % rand_range) {
                 update_orientation(orientation, 2, this->angle_mod_ * -1);
@@ -212,7 +206,6 @@ void LSystem::GenerateVertices() {
             //Pitch up by angle_mod
         } else if (this->fractal_string_[i] == '^') {
 
-            //work out angle
             if (1 != rand() % rand_range) {
                 update_orientation(orientation, 1, this->angle_mod_ * -1);
             } else {
@@ -222,7 +215,6 @@ void LSystem::GenerateVertices() {
             //Roll left by angle_mod
         } else if (this->fractal_string_[i] == '\\') {
 
-            //work out angle
             if (1 != rand() % rand_range) {
                 update_orientation(orientation, 0, this->angle_mod_);
             } else {
@@ -232,7 +224,6 @@ void LSystem::GenerateVertices() {
             //Roll right by angle_mod
         } else if (this->fractal_string_[i] == '/') {
 
-            //work out angle
             if (1 != rand() % rand_range) {
                 update_orientation(orientation, 0, this->angle_mod_ * -1);
             } else {
@@ -244,7 +235,7 @@ void LSystem::GenerateVertices() {
 
             orientation = glm::rotate(full_turn, orientation);
 
-            //Push the current state of the turtle onto a stack
+            //Push the current state of the turtle onto the stack
         } else if (this->fractal_string_[i] == '[') {
             position_buffer.push_back(current_position);
             angle_buffer.push_back(orientation);
@@ -260,6 +251,7 @@ void LSystem::GenerateVertices() {
         }
     }
 
+    //Orients the tree the correct way
     for (int i = 0; i < vertices_.size(); i += 3) {
 
         float vertex[] = {vertices_[i], vertices_[i + 1], vertices_[i + 2]};
@@ -273,6 +265,12 @@ void LSystem::GenerateVertices() {
     }
 }
 
+/**
+ * Updates the orientation according to the angle given to it
+ * @param orientation
+ * @param axis
+ * @param angle
+ */
 void LSystem::update_orientation(glm::vec3 &orientation, int axis, float angle) {
     switch (axis) {
 
@@ -289,6 +287,9 @@ void LSystem::update_orientation(glm::vec3 &orientation, int axis, float angle) 
             //z
         case 2:
             orientation = glm::rotate(glm::quat(glm::vec3(0, 0, angle)), orientation);
+            return;
+
+        default:
             return;
     }
 }

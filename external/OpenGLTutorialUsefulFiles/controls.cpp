@@ -1,68 +1,116 @@
-// Include GLFW
-#include <glfw3.h>
 
-extern GLFWwindow *window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
-
-// Include GLM
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-using namespace glm;
 
 #include "controls.hpp"
 
-glm::mat4 ViewMatrix;
-glm::mat4 ProjectionMatrix;
 
+/**
+ * This class is a bit of a mess, as it is an adapted version of the controls class provided by
+ * http://opengl-tutorial.org
+ *
+ * Therefore, whilst attempts have been made to tidy it up, please excuse the mess.
+ *
+ * This class computes the camera's MVP & handles key inputs.
+ */
+
+/* Constructors */
 
 Controls::Controls() {
 
+    //Initial position
     position = glm::vec3(0, 5, 0);
-// Initial horizontal angle : toward -Z
+
+    // Initial horizontal angle : toward -Z
     horizontalAngle = 4.0f;
-// Initial vertical angle : none
+
+    // Initial vertical angle : none
     verticalAngle = 9.0f;
-// Initial Field of View
+
+    // Initial Field of View
     initialFoV = 45.0f;
 
-    speed = 2000.0f; // 3 units / second
+    // Camera speed
+    speed = 2000.0f;
+
+    // Mouse speed
     mouseSpeed = 0.005f;
+
+    //Initial lod_level
     lod_level = 8;
+
+    //Initial colour palette
     colour_palette = 3;
+
+    //Initial draw state of l-systems
     show_l_systems = true;
+
+    //Initial draw state of terrain
     show_terrain = true;
 
 }
 
+/* Getters and Setters */
+
+/**
+ * Returns the view matrix
+ * @return mat4
+ */
 glm::mat4 Controls::getViewMatrix() {
     return ViewMatrix;
 }
 
+/**
+ * Returns the projection matrix
+ * @return mat4
+ */
 glm::mat4 Controls::getProjectionMatrix() {
     return ProjectionMatrix;
 }
 
-
+/**
+ * Returns the current camera position
+ * @return vec3
+ */
 glm::vec3 Controls::get_position() {
     return position;
 }
 
+/**
+ * Returns the current lod_level
+ * @return
+ */
 int Controls::get_lod_level() {
     return lod_level;
 }
 
+/**
+ * Returns the current colour palette
+ * @return
+ */
 int Controls::get_colour_palette() const {
     return colour_palette;
 }
 
+/**
+ * Returns whether to show l_systems
+ * @return
+ */
 bool Controls::is_show_l_systems() const {
     return show_l_systems;
 }
 
+/**
+ * Returns whether to show terrain
+ * @return
+ */
 bool Controls::is_show_terrain() const {
     return show_terrain;
 }
 
+/* Main methods */
+
+/**
+ * Works out the camera's MVP matrix
+ */
 void Controls::computeMatricesFromInputs() {
 
     // glfwGetTime is called only once, the first time this function is called
@@ -115,29 +163,30 @@ void Controls::computeMatricesFromInputs() {
 
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
-
-//    std::cout << "{ " << position.x << ", " << position.y << ", " << position.z << "}" << std::endl;
-
-//    std::cout << "horizon: " << horizontalAngle << ", verticalAngle: " << verticalAngle << std::endl;
 }
 
-
+/**
+ * Handles key inputs
+ */
 void Controls::check_keypress() {
 
-
     //Movement Checker
+
     // Move forward
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         position += direction * deltaTime * speed;
     }
+
     // Move backward
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         position -= direction * deltaTime * speed;
     }
+
     // Strafe right
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         position += right * deltaTime * speed;
     }
+
     // Strafe left
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         position -= right * deltaTime * speed;
@@ -211,8 +260,6 @@ void Controls::check_keypress() {
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         show_terrain = true;
     }
-
-
 }
 
 
