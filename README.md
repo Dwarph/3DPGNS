@@ -12,14 +12,14 @@ with the exception of controls.cpp & controls.hpp, which have been significantly
 See a devlog [here](https://twitter.com/dwarph/status/968892031220232192).
 
 
-## Compile and Run Instructions
+# Compile and Run Instructions
 
 Whilst glew, glm and nanogui are all included with this build,
 please ensure that you have the latest versions of CMake, C++, OpenGL and Boost installed.
 
 This project has only been tested on Linux based systems.
 
-# Compile instructions:
+## Compile instructions:
 
 From a command line, navigate to the build folder.
 type "cmake .."
