@@ -9,6 +9,8 @@ with the exception of main.cpp, which was initially based off of a tutorial from
 All code in external/OpenGLTutorialUsefulFiles remains untouched from the tutorial http://opengl-tutorial.org,
 with the exception of controls.cpp & controls.hpp, which have been significantly modified.
 
+See a devlog [here](https://twitter.com/dwarph/status/968892031220232192).
+
 
 #Compile and Run Instructions
 
@@ -23,7 +25,7 @@ From a command line, navigate to the build folder.
 type "cmake .."
 type make all
 
-#Run instructions:
+## Run instructions:
 
 In the build folder, type "./3DPGNS"
 
